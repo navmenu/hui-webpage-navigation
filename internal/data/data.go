@@ -15,7 +15,6 @@ var ProviderSet = wire.NewSet(NewData, NewPingRepo)
 
 // Data .
 type Data struct {
-	// TODO wrapped database client
 	db   *gorm.DB
 	xlog *log.Helper
 }
@@ -54,4 +53,8 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 		db:   db,
 		xlog: xlog,
 	}, cleanup, nil
+}
+
+func (data *Data) DB() *gorm.DB {
+	return data.db
 }
