@@ -3,20 +3,18 @@
 
 openapi: 3.0.3
 info:
-    title: Greeter API
-    description: The greeting service definition.
+    title: Ping API
     version: 0.0.1
 paths:
-    /helloworld/{name}:
+    /api/web-navigation/v1/ping:
         get:
             tags:
-                - Greeter
-            description: Sends a greeting
-            operationId: Greeter_SayHello
+                - Ping
+            operationId: Ping_Ping
             parameters:
-                - name: name
-                  in: path
-                  required: true
+                - name: value
+                  in: query
+                  description: The string value.
                   schema:
                     type: string
             responses:
@@ -25,14 +23,15 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+                                $ref: '#/components/schemas/google.protobuf.StringValue'
 components:
     schemas:
-        helloworld.v1.HelloReply:
+        google.protobuf.StringValue:
             type: object
             properties:
-                message:
+                value:
                     type: string
-            description: The response message containing the greetings
+                    description: The string value.
+            description: Wrapper message for `string`. The JSON representation for `StringValue` is JSON string.
 tags:
-    - name: Greeter
+    - name: Ping
