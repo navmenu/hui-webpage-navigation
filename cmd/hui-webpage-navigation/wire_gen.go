@@ -31,8 +31,10 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	pingRepo := data.NewPingRepo(dataData, logger)
 	pingUsecase := biz.NewPingUsecase(pingRepo, logger)
 	pingService := service.NewPingService(pingUsecase, logger)
-	grpcServer := server.NewGRPCServer(confServer, pingService, logger)
-	httpServer := server.NewHTTPServer(confServer, pingService, logger)
+	naviService := service.NewNaviService()
+	naviLvl2Service := service.NewNaviLvl2Service()
+	grpcServer := server.NewGRPCServer(confServer, pingService, naviService, naviLvl2Service, logger)
+	httpServer := server.NewHTTPServer(confServer, pingService, naviService, naviLvl2Service, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

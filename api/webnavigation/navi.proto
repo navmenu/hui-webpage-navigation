@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package api.webnavigation;
+
+option go_package = "hui-webpage-navigation/api/webnavigation;webnavigation";
+option java_multiple_files = true;
+option java_package = "api.webnavigation";
+
+import "google/api/annotations.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "errors/errors.proto";
+
+service Navi {
+  // 分类添加
+  rpc CreateNavi(CreateNaviRequest) returns (CreateNaviReply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/create_navi"
+      body: "*"
+    };
+  }
+  // 分类删除
+  rpc DeleteNavi(DeleteNaviRequest) returns (DeleteNaviReply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/delete_navi"
+      body: "*"
+    };
+  }
+  // 分类排序
+  rpc SortNavi(SortNaviRequest) returns (SortNaviReply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/sort_navi"
+      body: "*"
+    };
+  }
+  // 分类列表
+  rpc ListNavi(ListNaviRequest) returns (ListNaviReply) {
+    option (google.api.http) = {
+      get: "/api/web-navigation/v1/list_navi"
+    };
+  }
+  // 主要是看"同一个cookie和IP"是否"勾选下次不再提醒"，我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
+  rpc GetGuestSettings(GetGuestSettingsRequest) returns (GetGuestSettingsReply) {
+    option (google.api.http) = {
+      get: "/api/web-navigation/v1/get_guest_settings"
+    };
+  }
+  // 记录"同一个cookie和IP"已经"勾选下次不再提醒"-也可记录在redis里
+  rpc SetNotRemindInfo(SetNotRemindInfoRequest) returns (SetNotRemindInfoReply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/set_not_remind_info"
+      body: "*"
+    };
+  }
+}
+
+message CreateNaviRequest {
+  string name = 1;
+}
+message CreateNaviReply {
+  string name = 1;
+}
+
+message NaviType {
+  string name = 1;
+  int32 index = 2;
+}
+
+message DeleteNaviRequest {
+  string name = 1;
+}
+message DeleteNaviReply {}
+
+message SortNaviRequest {
+  repeated string names = 1;  // 把新的顺序完整的传过来
+}
+message SortNaviReply {}
+
+message ListNaviRequest {}
+message ListNaviReply {
+  repeated NaviType items = 1;
+}
+
+message GetGuestSettingsRequest {
+  string ip = 1;      // 根据cookie和IP判断，是否首次登陆
+  string cookie = 2;  // 根据cookie和IP判断，是否首次登陆
+}
+message GetGuestSettingsReply {
+  bool is_not_remind_info = 1;  ////根据cookie和IP判断，是否首次登陆
+}
+
+message SetNotRemindInfoRequest {
+  string ip = 1;      // 根据cookie和IP判断，是否首次登陆
+  string cookie = 2;  // 根据cookie和IP判断，是否首次登陆
+}
+message SetNotRemindInfoReply {}

@@ -11,7 +11,13 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, pingService *service.PingService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(
+	c *conf.Server,
+	pingService *service.PingService,
+	naviService *service.NaviService,
+	naviLvl2Service *service.NaviLvl2Service,
+	logger log.Logger,
+) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -28,5 +34,7 @@ func NewGRPCServer(c *conf.Server, pingService *service.PingService, logger log.
 	}
 	srv := grpc.NewServer(opts...)
 	webnavigation.RegisterPingServer(srv, pingService)
+	webnavigation.RegisterNaviServer(srv, naviService)
+	webnavigation.RegisterNaviLvl2Server(srv, naviLvl2Service)
 	return srv
 }

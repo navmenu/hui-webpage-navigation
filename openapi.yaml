@@ -3,9 +3,138 @@
 
 openapi: 3.0.3
 info:
-    title: Ping API
+    title: ""
     version: 0.0.1
 paths:
+    /api/web-navigation/v1/create_navi:
+        post:
+            tags:
+                - Navi
+            description: 分类添加
+            operationId: Navi_CreateNavi
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.CreateNaviRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.CreateNaviReply'
+    /api/web-navigation/v1/create_navi_lvl2:
+        post:
+            tags:
+                - NaviLvl2
+            description: 分类内容添加
+            operationId: NaviLvl2_CreateNaviLvl2
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.CreateNaviLvl2Request'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.CreateNaviLvl2Reply'
+    /api/web-navigation/v1/delete_navi:
+        post:
+            tags:
+                - Navi
+            description: 分类删除
+            operationId: Navi_DeleteNavi
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.DeleteNaviRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.DeleteNaviReply'
+    /api/web-navigation/v1/delete_navi_lvl2:
+        post:
+            tags:
+                - NaviLvl2
+            description: 分类内容删除
+            operationId: NaviLvl2_DeleteNaviLvl2
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.DeleteNaviLvl2Request'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.DeleteNaviLvl2Reply'
+    /api/web-navigation/v1/get_guest_settings:
+        get:
+            tags:
+                - Navi
+            description: 主要是看"同一个cookie和IP"是否"勾选下次不再提醒"，我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
+            operationId: Navi_GetGuestSettings
+            parameters:
+                - name: ip
+                  in: query
+                  schema:
+                    type: string
+                - name: cookie
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.GetGuestSettingsReply'
+    /api/web-navigation/v1/list_navi:
+        get:
+            tags:
+                - Navi
+            description: 分类列表
+            operationId: Navi_ListNavi
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.ListNaviReply'
+    /api/web-navigation/v1/list_navi_lvl2:
+        get:
+            tags:
+                - NaviLvl2
+            description: 分类内容列表
+            operationId: NaviLvl2_ListNaviLvl2
+            parameters:
+                - name: naviName
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.ListNaviLvl2Reply'
     /api/web-navigation/v1/ping:
         get:
             tags:
@@ -24,8 +153,188 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/google.protobuf.StringValue'
+    /api/web-navigation/v1/set_not_remind_info:
+        post:
+            tags:
+                - Navi
+            description: 记录"同一个cookie和IP"已经"勾选下次不再提醒"-也可记录在redis里
+            operationId: Navi_SetNotRemindInfo
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.SetNotRemindInfoRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.SetNotRemindInfoReply'
+    /api/web-navigation/v1/sort_navi:
+        post:
+            tags:
+                - Navi
+            description: 分类排序
+            operationId: Navi_SortNavi
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.SortNaviRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.SortNaviReply'
+    /api/web-navigation/v1/sort_navi_lvl2:
+        post:
+            tags:
+                - NaviLvl2
+            description: 分类内容排序
+            operationId: NaviLvl2_SortNaviLvl2
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.SortNaviLvl2Request'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.SortNaviLvl2Reply'
 components:
     schemas:
+        api.webnavigation.CreateNaviLvl2Reply:
+            type: object
+            properties:
+                naviName:
+                    type: string
+                name:
+                    type: string
+        api.webnavigation.CreateNaviLvl2Request:
+            type: object
+            properties:
+                naviName:
+                    type: string
+                name:
+                    type: string
+                text:
+                    type: string
+                link:
+                    type: string
+                isEscrow:
+                    type: boolean
+        api.webnavigation.CreateNaviReply:
+            type: object
+            properties:
+                name:
+                    type: string
+        api.webnavigation.CreateNaviRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+        api.webnavigation.DeleteNaviLvl2Reply:
+            type: object
+            properties: {}
+        api.webnavigation.DeleteNaviLvl2Request:
+            type: object
+            properties:
+                naviName:
+                    type: string
+                name:
+                    type: string
+        api.webnavigation.DeleteNaviReply:
+            type: object
+            properties: {}
+        api.webnavigation.DeleteNaviRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+        api.webnavigation.GetGuestSettingsReply:
+            type: object
+            properties:
+                isNotRemindInfo:
+                    type: boolean
+        api.webnavigation.ListNaviLvl2Reply:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.webnavigation.NaviLvl2Type'
+        api.webnavigation.ListNaviReply:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.webnavigation.NaviType'
+        api.webnavigation.NaviLvl2Type:
+            type: object
+            properties:
+                naviName:
+                    type: string
+                name:
+                    type: string
+                text:
+                    type: string
+                link:
+                    type: string
+                isEscrow:
+                    type: boolean
+                index:
+                    type: integer
+                    format: int32
+        api.webnavigation.NaviType:
+            type: object
+            properties:
+                name:
+                    type: string
+                index:
+                    type: integer
+                    format: int32
+        api.webnavigation.SetNotRemindInfoReply:
+            type: object
+            properties: {}
+        api.webnavigation.SetNotRemindInfoRequest:
+            type: object
+            properties:
+                ip:
+                    type: string
+                cookie:
+                    type: string
+        api.webnavigation.SortNaviLvl2Reply:
+            type: object
+            properties: {}
+        api.webnavigation.SortNaviLvl2Request:
+            type: object
+            properties:
+                naviName:
+                    type: string
+                names:
+                    type: array
+                    items:
+                        type: string
+        api.webnavigation.SortNaviReply:
+            type: object
+            properties: {}
+        api.webnavigation.SortNaviRequest:
+            type: object
+            properties:
+                names:
+                    type: array
+                    items:
+                        type: string
         google.protobuf.StringValue:
             type: object
             properties:
@@ -34,4 +343,6 @@ components:
                     description: The string value.
             description: Wrapper message for `string`. The JSON representation for `StringValue` is JSON string.
 tags:
+    - name: Navi
+    - name: NaviLvl2
     - name: Ping

@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package api.webnavigation;
+
+option go_package = "hui-webpage-navigation/api/webnavigation;webnavigation";
+option java_multiple_files = true;
+option java_package = "api.webnavigation";
+
+import "google/api/annotations.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "errors/errors.proto";
+
+service NaviLvl2 {
+  // 分类内容添加
+  rpc CreateNaviLvl2(CreateNaviLvl2Request) returns (CreateNaviLvl2Reply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/create_navi_lvl2"
+      body: "*"
+    };
+  }
+  // 分类内容删除
+  rpc DeleteNaviLvl2(DeleteNaviLvl2Request) returns (DeleteNaviLvl2Reply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/delete_navi_lvl2"
+      body: "*"
+    };
+  }
+  // 分类内容排序
+  rpc SortNaviLvl2(SortNaviLvl2Request) returns (SortNaviLvl2Reply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/sort_navi_lvl2"
+      body: "*"
+    };
+  }
+  // 分类内容列表
+  rpc ListNaviLvl2(ListNaviLvl2Request) returns (ListNaviLvl2Reply) {
+    option (google.api.http) = {
+      get: "/api/web-navigation/v1/list_navi_lvl2"
+    };
+  }
+}
+
+message CreateNaviLvl2Request {
+  string navi_name = 1;  // 分类名称：你要添加在哪个分类里
+  string name = 2;       // 名称：按钮上的简洁文字
+  string text = 3;       // 中转页面内容部分包含以下元素 文案：后台自定义，比如“这是汇旺担保群，点击直达：”，文案单独一行；
+  string link = 4;       // 中转页面内容部分包含以下元素 链接：后台自定义链接文案，自定义链接的地址；字号比前面一行大两号；
+  bool is_escrow = 5;    // 需求-添加分类内容时可以勾选担保标志
+}
+message CreateNaviLvl2Reply {
+  string navi_name = 1;
+  string name = 2;
+}
+
+message NaviLvl2Type {
+  string navi_name = 1;  // 分类名称
+  string name = 2;       // 名称：按钮上的简洁文字
+  string text = 3;       // 中转页面内容部分包含以下元素 文案：后台自定义，比如“这是汇旺担保群，点击直达：”，文案单独一行；
+  string link = 4;       // 中转页面内容部分包含以下元素 链接：后台自定义链接文案，自定义链接的地址；字号比前面一行大两号；
+  bool is_escrow = 5;    // 需求-添加分类内容时可以勾选担保标志
+  int32 index = 6;       // 当前序号
+}
+
+message DeleteNaviLvl2Request {
+  string navi_name = 1;
+  string name = 2;
+}
+message DeleteNaviLvl2Reply {}
+
+message SortNaviLvl2Request {
+  string navi_name = 1;
+  repeated string names = 2;  // 把新的顺序完整的传过来
+}
+message SortNaviLvl2Reply {}
+
+message ListNaviLvl2Request {
+  string navi_name = 1;
+}
+message ListNaviLvl2Reply {
+  repeated NaviLvl2Type items = 1;
+}

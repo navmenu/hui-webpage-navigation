@@ -32,10 +32,9 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 	}
 	// 自动迁移各种模型
 	err = db.AutoMigrate(
-		&models.User{},
-		&models.Article{},
-		&models.Tag{},
-		&models.ArticleTag{},
+		&models.Navi{},
+		&models.NaviLvl2{},
+		&models.GuestSettings{},
 	)
 	if err != nil {
 		panic(err)

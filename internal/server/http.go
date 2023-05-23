@@ -11,7 +11,13 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, pingService *service.PingService, logger log.Logger) *http.Server {
+func NewHTTPServer(
+	c *conf.Server,
+	pingService *service.PingService,
+	naviService *service.NaviService,
+	naviLvl2Service *service.NaviLvl2Service,
+	logger log.Logger,
+) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -28,5 +34,7 @@ func NewHTTPServer(c *conf.Server, pingService *service.PingService, logger log.
 	}
 	srv := http.NewServer(opts...)
 	webnavigation.RegisterPingHTTPServer(srv, pingService)
+	webnavigation.RegisterNaviHTTPServer(srv, naviService)
+	webnavigation.RegisterNaviLvl2HTTPServer(srv, naviLvl2Service)
 	return srv
 }
