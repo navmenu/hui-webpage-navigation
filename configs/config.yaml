@@ -10,6 +10,7 @@ data:
     driver: mysql
     # source: root:root@tcp(127.0.0.1:3306)/test
     source: "root:123456@tcp(127.0.0.1:3306)/HuiWebpageNavigation?charset=utf8mb4&parseTime=True&loc=Local"
+    echo: true
   redis:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s

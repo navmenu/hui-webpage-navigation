@@ -37,7 +37,7 @@ service NaviLvl2 {
       body: "*"
     };
   }
-  // 分类内容列表
+  // 分类内容列表，这个接口可能是多余的，因为获得分类的时候已经顺带获取了内容
   rpc ListNaviLvl2(ListNaviLvl2Request) returns (ListNaviLvl2Reply) {
     option (google.api.http) = {
       get: "/api/web-navigation/v1/list_navi_lvl2"
@@ -53,8 +53,8 @@ message CreateNaviLvl2Request {
   bool is_escrow = 5;    // 需求-添加分类内容时可以勾选担保标志
 }
 message CreateNaviLvl2Reply {
-  string navi_name = 1;
-  string name = 2;
+  string navi_name = 1;  // 在哪个分类下添加（由于分类不会重命名，也就没必要用ID表示）
+  string name = 2;       // 内容名称
 }
 
 message NaviLvl2Type {
@@ -67,20 +67,20 @@ message NaviLvl2Type {
 }
 
 message DeleteNaviLvl2Request {
-  string navi_name = 1;
-  string name = 2;
+  string navi_name = 1;  // 分类名称
+  string name = 2;       // 内容名称
 }
 message DeleteNaviLvl2Reply {}
 
 message SortNaviLvl2Request {
-  string navi_name = 1;
+  string navi_name = 1;       // 分类名称
   repeated string names = 2;  // 把新的顺序完整的传过来
 }
 message SortNaviLvl2Reply {}
 
 message ListNaviLvl2Request {
-  string navi_name = 1;
+  string navi_name = 1;  // 分类名称
 }
 message ListNaviLvl2Reply {
-  repeated NaviLvl2Type items = 1;
+  repeated NaviLvl2Type items = 1;  // 内容是有序的
 }

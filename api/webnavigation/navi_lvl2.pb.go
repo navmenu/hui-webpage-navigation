@@ -112,8 +112,8 @@ type CreateNaviLvl2Reply struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	NaviName string `protobuf:"bytes,1,opt,name=navi_name,json=naviName,proto3" json:"navi_name,omitempty"`
-	Name     string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	NaviName string `protobuf:"bytes,1,opt,name=navi_name,json=naviName,proto3" json:"navi_name,omitempty"` // 在哪个分类下添加（由于分类不会重命名，也就没必要用ID表示）
+	Name     string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                         // 内容名称
 }
 
 func (x *CreateNaviLvl2Reply) Reset() {
@@ -254,8 +254,8 @@ type DeleteNaviLvl2Request struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	NaviName string `protobuf:"bytes,1,opt,name=navi_name,json=naviName,proto3" json:"navi_name,omitempty"`
-	Name     string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	NaviName string `protobuf:"bytes,1,opt,name=navi_name,json=naviName,proto3" json:"navi_name,omitempty"` // 分类名称
+	Name     string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                         // 内容名称
 }
 
 func (x *DeleteNaviLvl2Request) Reset() {
@@ -347,8 +347,8 @@ type SortNaviLvl2Request struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	NaviName string   `protobuf:"bytes,1,opt,name=navi_name,json=naviName,proto3" json:"navi_name,omitempty"`
-	Names    []string `protobuf:"bytes,2,rep,name=names,proto3" json:"names,omitempty"` // 把新的顺序完整的传过来
+	NaviName string   `protobuf:"bytes,1,opt,name=navi_name,json=naviName,proto3" json:"navi_name,omitempty"` // 分类名称
+	Names    []string `protobuf:"bytes,2,rep,name=names,proto3" json:"names,omitempty"`                       // 把新的顺序完整的传过来
 }
 
 func (x *SortNaviLvl2Request) Reset() {
@@ -440,7 +440,7 @@ type ListNaviLvl2Request struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	NaviName string `protobuf:"bytes,1,opt,name=navi_name,json=naviName,proto3" json:"navi_name,omitempty"`
+	NaviName string `protobuf:"bytes,1,opt,name=navi_name,json=naviName,proto3" json:"navi_name,omitempty"` // 分类名称
 }
 
 func (x *ListNaviLvl2Request) Reset() {
@@ -487,7 +487,7 @@ type ListNaviLvl2Reply struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Items []*NaviLvl2Type `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	Items []*NaviLvl2Type `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"` // 内容是有序的
 }
 
 func (x *ListNaviLvl2Reply) Reset() {

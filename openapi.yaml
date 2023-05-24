@@ -86,17 +86,12 @@ paths:
         get:
             tags:
                 - Navi
-            description: 主要是看"同一个cookie和IP"是否"勾选下次不再提醒"，我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
+            description: |-
+                主要是看"同一个cookie和IP"是否"勾选下次不再提醒"
+                 我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
+                 即使没有设置，也会返回一个默认值的结果，比如false和0等
+                 需要在请求里带cookie
             operationId: Navi_GetGuestSettings
-            parameters:
-                - name: ip
-                  in: query
-                  schema:
-                    type: string
-                - name: cookie
-                  in: query
-                  schema:
-                    type: string
             responses:
                 "200":
                     description: OK
@@ -108,7 +103,7 @@ paths:
         get:
             tags:
                 - Navi
-            description: 分类列表
+            description: 分类列表，目前看来获得分类列表的时候必然要获得内容，因此一起返回，假如不需要可以再改
             operationId: Navi_ListNavi
             responses:
                 "200":
@@ -121,7 +116,7 @@ paths:
         get:
             tags:
                 - NaviLvl2
-            description: 分类内容列表
+            description: 分类内容列表，这个接口可能是多余的，因为获得分类的时候已经顺带获取了内容
             operationId: NaviLvl2_ListNaviLvl2
             parameters:
                 - name: naviName
@@ -157,7 +152,9 @@ paths:
         post:
             tags:
                 - Navi
-            description: 记录"同一个cookie和IP"已经"勾选下次不再提醒"-也可记录在redis里
+            description: |-
+                记录"同一个cookie和IP"已经"勾选下次不再提醒"-也可记录在redis里
+                 需要在请求里带cookie
             operationId: Navi_SetNotRemindInfo
             requestBody:
                 content:
@@ -176,7 +173,7 @@ paths:
         post:
             tags:
                 - Navi
-            description: 分类排序
+            description: 分类排序，策略是把新的顺序完整的发过来，假如需要其它策略可以再改代码
             operationId: Navi_SortNavi
             requestBody:
                 content:
@@ -260,6 +257,8 @@ components:
             properties:
                 name:
                     type: string
+                force:
+                    type: boolean
         api.webnavigation.GetGuestSettingsReply:
             type: object
             properties:
@@ -278,7 +277,32 @@ components:
                 items:
                     type: array
                     items:
-                        $ref: '#/components/schemas/api.webnavigation.NaviType'
+                        $ref: '#/components/schemas/api.webnavigation.NaviListItemType'
+        api.webnavigation.NaviListItemType:
+            type: object
+            properties:
+                navi:
+                    $ref: '#/components/schemas/api.webnavigation.NaviType'
+                naviLvl2s:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.webnavigation.NaviLvl2Item'
+        api.webnavigation.NaviLvl2Item:
+            type: object
+            properties:
+                naviName:
+                    type: string
+                name:
+                    type: string
+                text:
+                    type: string
+                link:
+                    type: string
+                isEscrow:
+                    type: boolean
+                index:
+                    type: integer
+                    format: int32
         api.webnavigation.NaviLvl2Type:
             type: object
             properties:
@@ -308,11 +332,7 @@ components:
             properties: {}
         api.webnavigation.SetNotRemindInfoRequest:
             type: object
-            properties:
-                ip:
-                    type: string
-                cookie:
-                    type: string
+            properties: {}
         api.webnavigation.SortNaviLvl2Reply:
             type: object
             properties: {}

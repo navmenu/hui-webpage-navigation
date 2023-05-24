@@ -30,7 +30,8 @@ func (*NaviLvl2) TableName() string {
 
 const GuestSettingsTable = "guest_settings"
 
-// GuestSettings 客户端设置 其实这个信息应该放在redis里面
+// GuestSettings 客户端设置
+// 其实这个信息应该放在redis里面，设置30天过期，但目前功能极少只用1个db就行，没必要上两个组件吧
 type GuestSettings struct {
 	ID              uint64 `gorm:"primary_key" json:"id"`
 	Ip              string `gorm:"index:udx_guest_ip_cookie,unique" json:"ip,omitempty"`     // 根据cookie和IP判断，是否首次登陆

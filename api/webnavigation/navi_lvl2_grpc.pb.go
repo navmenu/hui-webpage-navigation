@@ -35,7 +35,7 @@ type NaviLvl2Client interface {
 	DeleteNaviLvl2(ctx context.Context, in *DeleteNaviLvl2Request, opts ...grpc.CallOption) (*DeleteNaviLvl2Reply, error)
 	// 分类内容排序
 	SortNaviLvl2(ctx context.Context, in *SortNaviLvl2Request, opts ...grpc.CallOption) (*SortNaviLvl2Reply, error)
-	// 分类内容列表
+	// 分类内容列表，这个接口可能是多余的，因为获得分类的时候已经顺带获取了内容
 	ListNaviLvl2(ctx context.Context, in *ListNaviLvl2Request, opts ...grpc.CallOption) (*ListNaviLvl2Reply, error)
 }
 
@@ -93,7 +93,7 @@ type NaviLvl2Server interface {
 	DeleteNaviLvl2(context.Context, *DeleteNaviLvl2Request) (*DeleteNaviLvl2Reply, error)
 	// 分类内容排序
 	SortNaviLvl2(context.Context, *SortNaviLvl2Request) (*SortNaviLvl2Reply, error)
-	// 分类内容列表
+	// 分类内容列表，这个接口可能是多余的，因为获得分类的时候已经顺带获取了内容
 	ListNaviLvl2(context.Context, *ListNaviLvl2Request) (*ListNaviLvl2Reply, error)
 	mustEmbedUnimplementedNaviLvl2Server()
 }

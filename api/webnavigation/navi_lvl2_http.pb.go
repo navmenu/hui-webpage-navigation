@@ -29,7 +29,7 @@ type NaviLvl2HTTPServer interface {
 	CreateNaviLvl2(context.Context, *CreateNaviLvl2Request) (*CreateNaviLvl2Reply, error)
 	// DeleteNaviLvl2 分类内容删除
 	DeleteNaviLvl2(context.Context, *DeleteNaviLvl2Request) (*DeleteNaviLvl2Reply, error)
-	// ListNaviLvl2 分类内容列表
+	// ListNaviLvl2 分类内容列表，这个接口可能是多余的，因为获得分类的时候已经顺带获取了内容
 	ListNaviLvl2(context.Context, *ListNaviLvl2Request) (*ListNaviLvl2Reply, error)
 	// SortNaviLvl2 分类内容排序
 	SortNaviLvl2(context.Context, *SortNaviLvl2Request) (*SortNaviLvl2Reply, error)

@@ -30,26 +30,30 @@ service Navi {
       body: "*"
     };
   }
-  // 分类排序
+  // 分类排序，策略是把新的顺序完整的发过来，假如需要其它策略可以再改代码
   rpc SortNavi(SortNaviRequest) returns (SortNaviReply) {
     option (google.api.http) = {
       post: "/api/web-navigation/v1/sort_navi"
       body: "*"
     };
   }
-  // 分类列表
+  // 分类列表，目前看来获得分类列表的时候必然要获得内容，因此一起返回，假如不需要可以再改
   rpc ListNavi(ListNaviRequest) returns (ListNaviReply) {
     option (google.api.http) = {
       get: "/api/web-navigation/v1/list_navi"
     };
   }
-  // 主要是看"同一个cookie和IP"是否"勾选下次不再提醒"，我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
+  // 主要是看"同一个cookie和IP"是否"勾选下次不再提醒"
+  // 我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
+  // 即使没有设置，也会返回一个默认值的结果，比如false和0等
+  // 需要在请求里带cookie
   rpc GetGuestSettings(GetGuestSettingsRequest) returns (GetGuestSettingsReply) {
     option (google.api.http) = {
       get: "/api/web-navigation/v1/get_guest_settings"
     };
   }
   // 记录"同一个cookie和IP"已经"勾选下次不再提醒"-也可记录在redis里
+  // 需要在请求里带cookie
   rpc SetNotRemindInfo(SetNotRemindInfoRequest) returns (SetNotRemindInfoReply) {
     option (google.api.http) = {
       post: "/api/web-navigation/v1/set_not_remind_info"
@@ -59,42 +63,51 @@ service Navi {
 }
 
 message CreateNaviRequest {
-  string name = 1;
+  string name = 1;  // 分类名称
 }
 message CreateNaviReply {
-  string name = 1;
+  string name = 1;  // 分类名称
 }
 
 message NaviType {
-  string name = 1;
-  int32 index = 2;
+  string name = 1;  // 分类名称
+  int32 index = 2;  // 排序序号，按照程序下标的规则，第一个的序号是0
 }
 
 message DeleteNaviRequest {
-  string name = 1;
+  string name = 1;  // 删除分类名称
+  bool force = 2;   // 假如设置为false，假如分类下有东西就不能删除，假如设置为true就删除分类以及下面的东西
 }
 message DeleteNaviReply {}
 
 message SortNaviRequest {
-  repeated string names = 1;  // 把新的顺序完整的传过来
+  repeated string names = 1;  // 把分类名称按想要的顺序完整的传过来
 }
 message SortNaviReply {}
 
-message ListNaviRequest {}
-message ListNaviReply {
-  repeated NaviType items = 1;
+message NaviLvl2Item {
+  string navi_name = 1;  // 分类名称
+  string name = 2;       // 名称：按钮上的简洁文字
+  string text = 3;       // 中转页面内容部分包含以下元素 文案：后台自定义，比如“这是汇旺担保群，点击直达：”，文案单独一行；
+  string link = 4;       // 中转页面内容部分包含以下元素 链接：后台自定义链接文案，自定义链接的地址；字号比前面一行大两号；
+  bool is_escrow = 5;    // 需求-添加分类内容时可以勾选担保标志
+  int32 index = 6;       // 当前序号
 }
 
-message GetGuestSettingsRequest {
-  string ip = 1;      // 根据cookie和IP判断，是否首次登陆
-  string cookie = 2;  // 根据cookie和IP判断，是否首次登陆
+message NaviListItemType {
+  NaviType navi = 1;
+  repeated NaviLvl2Item navi_lvl2s = 2;  // 2级菜单是有序的
 }
+
+message ListNaviRequest {}
+message ListNaviReply {
+  repeated NaviListItemType items = 1;  // 1级菜单是有序的
+}
+
+message GetGuestSettingsRequest {}
 message GetGuestSettingsReply {
   bool is_not_remind_info = 1;  ////根据cookie和IP判断，是否首次登陆
 }
 
-message SetNotRemindInfoRequest {
-  string ip = 1;      // 根据cookie和IP判断，是否首次登陆
-  string cookie = 2;  // 根据cookie和IP判断，是否首次登陆
-}
+message SetNotRemindInfoRequest {}
 message SetNotRemindInfoReply {}

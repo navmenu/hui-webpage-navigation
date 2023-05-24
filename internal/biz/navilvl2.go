@@ -9,6 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type NaviLvl2Usecase struct {
@@ -24,40 +25,62 @@ func NewNaviLvl2Usecase(data *data.Data, logger log.Logger) *NaviLvl2Usecase {
 }
 
 func (uc *NaviLvl2Usecase) CreateNaviLvl2(ctx context.Context, req *pb.CreateNaviLvl2Request) (*models.NaviLvl2, *errors.Error) {
-	db := uc.data.DB()
-	var navi models.Navi
-	if err := db.WithContext(ctx).Table(models.NaviTable).Where("name=?", req.NaviName).First(&navi).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, pb.ErrorNotExist("navi name=%v not exist", req.NaviName)
-		} else {
-			return nil, pb.ErrorDbError("error=%v", err)
+	var naviLvl2 *models.NaviLvl2
+	var erk *errors.Error
+	if err := uc.data.DB().WithContext(ctx).Transaction(func(db *gorm.DB) error {
+		var navi models.Navi
+		//添加内容时需要锁住分类数据
+		if err := db.WithContext(ctx).Table(models.NaviTable).
+			Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("name=?", req.NaviName).First(&navi).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				erk = pb.ErrorNotExist("navi name=%v not exist", req.NaviName)
+				return erk
+			} else {
+				erk = pb.ErrorDbError("error=%v", err)
+				return erk
+			}
 		}
-	}
-	//检查内容是否存在
-	if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Where("navi_name=? and name=?", navi.Name, req.Name).First(&models.NaviLvl2{}).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			// do nothing
+		//检查内容是否已存在
+		if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Where("navi_name=? and name=?", navi.Name, req.Name).First(&models.NaviLvl2{}).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				// do nothing
+			} else {
+				erk = pb.ErrorDbError("error=%v", err)
+				return erk
+			}
 		} else {
-			return nil, pb.ErrorDbError("error=%v", err)
+			erk = pb.ErrorAlreadyExist("navi lvl2 name=%v already exist", req.Name)
+			return erk
 		}
-	} else {
-		return nil, pb.ErrorAlreadyExist("navi lvl2 name=%v already exist", req.Name)
-	}
-	var cnt int64
-	if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Where("navi_name=?", navi.Name).Count(&cnt).Error; err != nil {
-		return nil, pb.ErrorDbError("error=%v", err)
-	}
-	var naviLvl2 = &models.NaviLvl2{
-		ID:       0,
-		NaviName: req.NaviName,
-		Name:     req.Name,
-		Text:     req.Text,
-		Link:     req.Link,
-		IsEscrow: req.IsEscrow,
-		Index:    int32(cnt),
-	}
-	if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Create(naviLvl2).Error; err != nil {
-		return nil, pb.ErrorDbError("error=%v", err)
+		//统计总数以生成排序的序号
+		var maxIndex int
+		if err := db.WithContext(ctx).Table(models.NaviLvl2Table).
+			Where("navi_name=?", navi.Name).
+			Select("COALESCE(MAX(navi_lvl2.index), -1)").Scan(&maxIndex).Error; err != nil {
+			erk = pb.ErrorDbError("error=%v", err)
+			return erk
+		}
+		newIndex := maxIndex + 1
+		naviLvl2 = &models.NaviLvl2{
+			ID:       0,
+			NaviName: req.NaviName,
+			Name:     req.Name,
+			Text:     req.Text,
+			Link:     req.Link,
+			IsEscrow: req.IsEscrow,
+			Index:    int32(newIndex),
+		}
+		if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Create(naviLvl2).Error; err != nil {
+			erk = pb.ErrorDbError("error=%v", err)
+			return erk
+		}
+		return nil
+	}); err != nil {
+		if erk != nil {
+			return nil, erk
+		}
+		return nil, pb.ErrorDbError("error=%v", erk)
 	}
 	return naviLvl2, nil
 }
