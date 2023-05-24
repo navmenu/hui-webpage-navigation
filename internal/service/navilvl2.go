@@ -77,12 +77,15 @@ func (s *NaviLvl2Service) SortNaviLvl2(ctx context.Context, req *pb.SortNaviLvl2
 	if utf8.RuneCountInString(req.NaviName) > 100 {
 		return nil, pb.ErrorBadParam("navi name is too long")
 	}
-	if len(req.Names) == 0 {
-		return nil, pb.ErrorMissingParam("navi lvl2 names is missing")
+	if len(req.Items) == 0 {
+		return nil, pb.ErrorMissingParam("navi lvl2 items is missing")
 	}
-	for _, name := range req.Names {
-		if utf8.RuneCountInString(name) > 100 {
+	for _, item := range req.Items {
+		if utf8.RuneCountInString(item.Name) > 100 {
 			return nil, pb.ErrorBadParam("navi lvl2 name is too long")
+		}
+		if item.Sort < 0 {
+			return nil, pb.ErrorBadParam("navi lvl2 sort is negative")
 		}
 	}
 	erk := s.uc.SortNaviLvl2(ctx, req)
@@ -120,6 +123,6 @@ func naviLvl22pb(x *models.NaviLvl2) *pb.NaviLvl2Type {
 		Text:     x.Text,
 		Link:     x.Link,
 		IsEscrow: x.IsEscrow,
-		Index:    x.Index,
+		Sort:     x.Sort,
 	}
 }

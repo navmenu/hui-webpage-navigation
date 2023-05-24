@@ -31,15 +31,18 @@ type NaviHTTPServer interface {
 	CreateNavi(context.Context, *CreateNaviRequest) (*CreateNaviReply, error)
 	// DeleteNavi 分类删除
 	DeleteNavi(context.Context, *DeleteNaviRequest) (*DeleteNaviReply, error)
-	// GetGuestSettings 主要是看"同一个cookie和IP"是否"勾选下次不再提醒"
-	// 我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
-	// 即使没有设置，也会返回一个默认值的结果，比如false和0等
-	// 需要在请求里带cookie
+	// GetGuestSettings 获取用户设置
+	// - 主要是看"同一个cookie和IP"是否"勾选下次不再提醒"
+	// - 我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
+	// - 弹窗不弹窗完全看他是否设置过"不再提醒"
+	// - 即使没有设置，也会返回一个默认值的结果，比如false和0等
+	// - 需要在请求里带cookie
 	GetGuestSettings(context.Context, *GetGuestSettingsRequest) (*GetGuestSettingsReply, error)
 	// ListNavi 分类列表，目前看来获得分类列表的时候必然要获得内容，因此一起返回，假如不需要可以再改
 	ListNavi(context.Context, *ListNaviRequest) (*ListNaviReply, error)
-	// SetNotRemindInfo 记录"同一个cookie和IP"已经"勾选下次不再提醒"-也可记录在redis里
-	// 需要在请求里带cookie
+	// SetNotRemindInfo 设置不再提醒
+	// - 记录"同一个cookie和IP"已经"勾选下次不再提醒"-也可记录在redis里
+	// - 需要在请求里带cookie
 	SetNotRemindInfo(context.Context, *SetNotRemindInfoRequest) (*SetNotRemindInfoReply, error)
 	// SortNavi 分类排序，策略是把新的顺序完整的发过来，假如需要其它策略可以再改代码
 	SortNavi(context.Context, *SortNaviRequest) (*SortNaviReply, error)

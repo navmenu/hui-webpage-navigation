@@ -54,12 +54,15 @@ func (s *NaviService) DeleteNavi(ctx context.Context, req *pb.DeleteNaviRequest)
 	return &pb.DeleteNaviReply{}, nil
 }
 func (s *NaviService) SortNavi(ctx context.Context, req *pb.SortNaviRequest) (*pb.SortNaviReply, error) {
-	if len(req.Names) == 0 {
-		return nil, pb.ErrorMissingParam("navi names is missing")
+	if len(req.Items) == 0 {
+		return nil, pb.ErrorMissingParam("navi items is missing")
 	}
-	for _, name := range req.Names {
-		if utf8.RuneCountInString(name) > 100 {
+	for _, item := range req.Items {
+		if utf8.RuneCountInString(item.Name) > 100 {
 			return nil, pb.ErrorBadParam("navi name is too long")
+		}
+		if item.Sort < 0 {
+			return nil, pb.ErrorBadParam("navi sort is negative")
 		}
 	}
 	erk := s.uc.SortNavi(ctx, req)
@@ -93,8 +96,8 @@ func naviTuple2pb(x *tuple.T2[*models.Navi, []*models.NaviLvl2]) *pb.NaviListIte
 
 func navi2pb(x *tuple.T2[*models.Navi, []*models.NaviLvl2]) *pb.NaviType {
 	return &pb.NaviType{
-		Name:  x.V1.Name,
-		Index: x.V1.Index,
+		Name: x.V1.Name,
+		Sort: x.V1.Sort,
 	}
 }
 
@@ -113,7 +116,7 @@ func naviLvl2item2pb(x *models.NaviLvl2) *pb.NaviLvl2Item {
 		Text:     x.Text,
 		Link:     x.Link,
 		IsEscrow: x.IsEscrow,
-		Index:    x.Index,
+		Sort:     x.Sort,
 	}
 }
 

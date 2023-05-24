@@ -63,7 +63,7 @@ message NaviLvl2Type {
   string text = 3;       // 中转页面内容部分包含以下元素 文案：后台自定义，比如“这是汇旺担保群，点击直达：”，文案单独一行；
   string link = 4;       // 中转页面内容部分包含以下元素 链接：后台自定义链接文案，自定义链接的地址；字号比前面一行大两号；
   bool is_escrow = 5;    // 需求-添加分类内容时可以勾选担保标志
-  int32 index = 6;       // 当前序号
+  int32 sort = 6;        // 当前序号
 }
 
 message DeleteNaviLvl2Request {
@@ -72,9 +72,14 @@ message DeleteNaviLvl2Request {
 }
 message DeleteNaviLvl2Reply {}
 
+message SortNaviLvl2Item {
+  string name = 1;  // 名称，不检查名字是否存在
+  int32 sort = 2;   // 新序号，非负数，不检查序号重复和冲突
+}
+
 message SortNaviLvl2Request {
-  string navi_name = 1;       // 分类名称
-  repeated string names = 2;  // 把新的顺序完整的传过来
+  string navi_name = 1;                 // 分类名称
+  repeated SortNaviLvl2Item items = 2;  // 把新的顺序传过来
 }
 message SortNaviLvl2Reply {}
 

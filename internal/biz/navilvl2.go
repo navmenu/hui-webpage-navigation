@@ -57,7 +57,7 @@ func (uc *NaviLvl2Usecase) CreateNaviLvl2(ctx context.Context, req *pb.CreateNav
 		var maxIndex int
 		if err := db.WithContext(ctx).Table(models.NaviLvl2Table).
 			Where("navi_name=?", navi.Name).
-			Select("COALESCE(MAX(navi_lvl2.index), -1)").Scan(&maxIndex).Error; err != nil {
+			Select("COALESCE(MAX(navi_lvl2.sort), -1)").Scan(&maxIndex).Error; err != nil {
 			erk = pb.ErrorDbError("error=%v", err)
 			return erk
 		}
@@ -69,7 +69,7 @@ func (uc *NaviLvl2Usecase) CreateNaviLvl2(ctx context.Context, req *pb.CreateNav
 			Text:     req.Text,
 			Link:     req.Link,
 			IsEscrow: req.IsEscrow,
-			Index:    int32(newIndex),
+			Sort:     int32(newIndex),
 		}
 		if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Create(naviLvl2).Error; err != nil {
 			erk = pb.ErrorDbError("error=%v", err)
@@ -103,8 +103,8 @@ func (uc *NaviLvl2Usecase) DeleteNaviLvl2(ctx context.Context, req *pb.DeleteNav
 
 func (uc *NaviLvl2Usecase) SortNaviLvl2(ctx context.Context, req *pb.SortNaviLvl2Request) *errors.Error {
 	if err := uc.data.DB().WithContext(ctx).Transaction(func(db *gorm.DB) error {
-		for idx, name := range req.Names {
-			if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Where("navi_name=? and name=?", req.NaviName, name).UpdateColumn("index", idx).Error; err != nil {
+		for _, item := range req.Items {
+			if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Where("navi_name=? and name=?", req.NaviName, item.Name).UpdateColumn("sort", item.Sort).Error; err != nil {
 				return err
 			}
 		}
@@ -118,7 +118,7 @@ func (uc *NaviLvl2Usecase) SortNaviLvl2(ctx context.Context, req *pb.SortNaviLvl
 func (uc *NaviLvl2Usecase) ListNaviLvl2(ctx context.Context, req *pb.ListNaviLvl2Request) ([]*models.NaviLvl2, *errors.Error) {
 	db := uc.data.DB()
 	var naviLvl2s []*models.NaviLvl2
-	if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Where("navi_name=?", req.NaviName).Order("navi_lvl2.index").Find(&naviLvl2s).Error; err != nil {
+	if err := db.WithContext(ctx).Table(models.NaviLvl2Table).Where("navi_name=?", req.NaviName).Order("navi_lvl2.sort").Find(&naviLvl2s).Error; err != nil {
 		return nil, pb.ErrorDbError("error=%v", err)
 	}
 	return naviLvl2s, nil

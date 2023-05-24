@@ -87,10 +87,12 @@ paths:
             tags:
                 - Navi
             description: |-
-                主要是看"同一个cookie和IP"是否"勾选下次不再提醒"
-                 我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
-                 即使没有设置，也会返回一个默认值的结果，比如false和0等
-                 需要在请求里带cookie
+                获取用户设置
+                 - 主要是看"同一个cookie和IP"是否"勾选下次不再提醒"
+                 - 我理解的，首次登陆也可以有多次，即每次关掉网页再打开即可视为首次登陆
+                 - 弹窗不弹窗完全看他是否设置过"不再提醒"
+                 - 即使没有设置，也会返回一个默认值的结果，比如false和0等
+                 - 需要在请求里带cookie
             operationId: Navi_GetGuestSettings
             responses:
                 "200":
@@ -153,8 +155,9 @@ paths:
             tags:
                 - Navi
             description: |-
-                记录"同一个cookie和IP"已经"勾选下次不再提醒"-也可记录在redis里
-                 需要在请求里带cookie
+                设置不再提醒
+                 - 记录"同一个cookie和IP"已经"勾选下次不再提醒"-也可记录在redis里
+                 - 需要在请求里带cookie
             operationId: Navi_SetNotRemindInfo
             requestBody:
                 content:
@@ -300,7 +303,7 @@ components:
                     type: string
                 isEscrow:
                     type: boolean
-                index:
+                sort:
                     type: integer
                     format: int32
         api.webnavigation.NaviLvl2Type:
@@ -316,7 +319,7 @@ components:
                     type: string
                 isEscrow:
                     type: boolean
-                index:
+                sort:
                     type: integer
                     format: int32
         api.webnavigation.NaviType:
@@ -324,7 +327,7 @@ components:
             properties:
                 name:
                     type: string
-                index:
+                sort:
                     type: integer
                     format: int32
         api.webnavigation.SetNotRemindInfoReply:
@@ -333,6 +336,22 @@ components:
         api.webnavigation.SetNotRemindInfoRequest:
             type: object
             properties: {}
+        api.webnavigation.SortNaviItem:
+            type: object
+            properties:
+                name:
+                    type: string
+                sort:
+                    type: integer
+                    format: int32
+        api.webnavigation.SortNaviLvl2Item:
+            type: object
+            properties:
+                name:
+                    type: string
+                sort:
+                    type: integer
+                    format: int32
         api.webnavigation.SortNaviLvl2Reply:
             type: object
             properties: {}
@@ -341,20 +360,20 @@ components:
             properties:
                 naviName:
                     type: string
-                names:
+                items:
                     type: array
                     items:
-                        type: string
+                        $ref: '#/components/schemas/api.webnavigation.SortNaviLvl2Item'
         api.webnavigation.SortNaviReply:
             type: object
             properties: {}
         api.webnavigation.SortNaviRequest:
             type: object
             properties:
-                names:
+                items:
                     type: array
                     items:
-                        type: string
+                        $ref: '#/components/schemas/api.webnavigation.SortNaviItem'
         google.protobuf.StringValue:
             type: object
             properties:
