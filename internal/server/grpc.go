@@ -3,7 +3,9 @@ package server
 import (
 	"hui-webpage-navigation/api/webnavigation"
 	"hui-webpage-navigation/internal/conf"
+	"hui-webpage-navigation/internal/data"
 	"hui-webpage-navigation/internal/service"
+	"hui-webpage-navigation/internal/utils/utils_kratos/utils_kratos_account_auth"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
@@ -15,6 +17,7 @@ import (
 // NewGRPCServer new a gRPC server.
 func NewGRPCServer(
 	c *conf.Server,
+	data *data.Data,
 	pingService *service.PingService,
 	naviService *service.NaviService,
 	naviLvl2Service *service.NaviLvl2Service,
@@ -25,6 +28,7 @@ func NewGRPCServer(
 			recovery.Recovery(),
 			tracing.Server(),
 			logging.Server(logger),
+			utils_kratos_account_auth.NewMiddleware(newCheckAdminConfig(data), logger),
 		),
 	}
 	if c.Grpc.Network != "" {
@@ -41,4 +45,18 @@ func NewGRPCServer(
 	webnavigation.RegisterNaviServer(srv, naviService)
 	webnavigation.RegisterNaviLvl2Server(srv, naviLvl2Service)
 	return srv
+}
+
+// 把需要鉴权的操作列在这里
+// 开发者失误了没有把不同权限的操作放在不同的地方
+func newCheckAdminConfig(data *data.Data) *utils_kratos_account_auth.Config {
+	return utils_kratos_account_auth.NewConfig(true, "admin_manage_token", true, []string{ //跳过鉴权的请求
+		"/api.webnavigation.Ping/Ping",
+		"/api.webnavigation.Navi/CreateNavi",
+		"/api.webnavigation.Navi/DeleteNavi",
+		"/api.webnavigation.Navi/SortNavi",
+		"/api.webnavigation.NaviLvl2/CreateNaviLvl2",
+		"/api.webnavigation.NaviLvl2/DeleteNaviLvl2",
+		"/api.webnavigation.NaviLvl2/SortNaviLvl2",
+	}, data.CheckManageToken)
 }

@@ -1,10 +1,12 @@
 package data
 
 import (
+	"context"
 	"hui-webpage-navigation/internal/conf"
 	"hui-webpage-navigation/internal/models"
 	"hui-webpage-navigation/internal/utils/utils_gorm/utils_gorm_mysql"
 
+	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 	"gorm.io/gorm"
@@ -57,4 +59,12 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 
 func (data *Data) DB() *gorm.DB {
 	return data.db
+}
+
+func (data *Data) CheckManageToken(ctx context.Context, token string) (context.Context, *errors.Error) {
+	//TODO 这里需要从DB里根据token/cookie查询管理员账号，但是没搞管理员系统，因此这里硬编码一下，稍后就改
+	if token != "123" {
+		return nil, errors.Unauthorized("UNAUTHORIZED", "data.CheckManageToken return wrong")
+	}
+	return ctx, nil
 }

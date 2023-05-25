@@ -3,7 +3,9 @@ package server
 import (
 	"hui-webpage-navigation/api/webnavigation"
 	"hui-webpage-navigation/internal/conf"
+	"hui-webpage-navigation/internal/data"
 	"hui-webpage-navigation/internal/service"
+	"hui-webpage-navigation/internal/utils/utils_kratos/utils_kratos_account_auth"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
@@ -15,6 +17,7 @@ import (
 // NewHTTPServer new an HTTP server.
 func NewHTTPServer(
 	c *conf.Server,
+	data *data.Data,
 	pingService *service.PingService,
 	naviService *service.NaviService,
 	naviLvl2Service *service.NaviLvl2Service,
@@ -25,6 +28,7 @@ func NewHTTPServer(
 			recovery.Recovery(),
 			tracing.Server(),
 			logging.Server(logger),
+			utils_kratos_account_auth.NewMiddleware(newCheckAdminConfig(data), logger),
 		),
 	}
 	if c.Http.Network != "" {
