@@ -17,8 +17,8 @@ COPY --from=builder /src/bin /app
 
 WORKDIR /app
 
-EXPOSE 8000
-EXPOSE 9000
+EXPOSE 38000
+EXPOSE 39000
 VOLUME /data/conf
 
-CMD ["./server", "-conf", "/data/conf"]
+CMD ["./hui-webpage-navigation", "-conf", "/data/conf"]
