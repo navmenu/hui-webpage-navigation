@@ -30,25 +30,37 @@ func (uc *AdminUsecase) CreateAdmin(ctx context.Context, req *pb.CreateAdminRequ
 	if err := db.WithContext(ctx).Table(models.AdminTable).Count(&count).Error; err != nil {
 		return nil, pb.ErrorDbError("error=%v", err)
 	}
-	var CreatedByUname string
+	var canCreateAdmin = req.CanCreateAdmin
+	var canSelectAdmin = req.CanSelectAdmin
+	var canEdit = req.CanEdit
+	var canSort = req.CanSort
+	var createdByUname string
 	if count > 0 {
 		admin, erk := GetAdminFromContext(ctx)
 		if erk != nil {
 			return nil, erk
 		}
-		CreatedByUname = admin.Username
+		if !admin.CanCreateAdmin {
+			return nil, pb.ErrorAdminNoPermission("can not create new admin")
+		}
+		createdByUname = admin.Username
+		//这里规定新管理员的权限不能高于老管理员
+		canCreateAdmin = canCreateAdmin && admin.CanCreateAdmin
+		canSelectAdmin = canSelectAdmin && admin.CanSelectAdmin
+		canEdit = canEdit && admin.CanEdit
+		canSort = canSort && admin.CanSort
 	}
 	var newAdmin = &models.Admin{
 		ID:             0,
 		Username:       req.Username,
 		Password:       req.Password,
 		Nickname:       req.Nickname,
-		CanCreateAdmin: req.CanCreateAdmin,
-		CanSelectAdmin: req.CanSelectAdmin,
-		CanEdit:        req.CanEdit,
-		CanSort:        req.CanSort,
+		CanCreateAdmin: canCreateAdmin,
+		CanSelectAdmin: canSelectAdmin,
+		CanEdit:        canEdit,
+		CanSort:        canSort,
 		Token:          "",
-		CreatedByUname: CreatedByUname,
+		CreatedByUname: createdByUname,
 	}
 	if err := db.WithContext(ctx).Table(models.AdminTable).Create(newAdmin).Error; err != nil {
 		return nil, pb.ErrorDbError("error=%v", err)
