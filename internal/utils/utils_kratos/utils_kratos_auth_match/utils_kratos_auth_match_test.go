@@ -1,4 +1,4 @@
-package utils_kratos_account_auth
+package utils_kratos_auth_match
 
 import (
 	"os"

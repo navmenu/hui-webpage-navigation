@@ -5,7 +5,7 @@ import (
 	"hui-webpage-navigation/internal/conf"
 	"hui-webpage-navigation/internal/data"
 	"hui-webpage-navigation/internal/service"
-	"hui-webpage-navigation/internal/utils/utils_kratos/utils_kratos_account_auth"
+	"hui-webpage-navigation/internal/utils/utils_kratos/utils_kratos_auth_match"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
@@ -29,11 +29,11 @@ func NewHTTPServer(
 			recovery.Recovery(),
 			tracing.Server(),
 			logging.Server(logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAdminOrNoAccConfig(data), logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAnonymousConfig(data), logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAdminConfig(data), logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAdminSortConfig(data), logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAdminEditConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAdminOrNoAccConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAnonymousConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAdminConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAdminSortConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAdminEditConfig(data), logger),
 		),
 	}
 	if c.Http.Network != "" {

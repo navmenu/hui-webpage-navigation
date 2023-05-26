@@ -7,7 +7,7 @@ import (
 	"hui-webpage-navigation/internal/conf"
 	"hui-webpage-navigation/internal/data"
 	"hui-webpage-navigation/internal/service"
-	"hui-webpage-navigation/internal/utils/utils_kratos/utils_kratos_account_auth"
+	"hui-webpage-navigation/internal/utils/utils_kratos/utils_kratos_auth_match"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
@@ -32,11 +32,11 @@ func NewGRPCServer(
 			recovery.Recovery(),
 			tracing.Server(),
 			logging.Server(logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAdminOrNoAccConfig(data), logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAnonymousConfig(data), logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAdminConfig(data), logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAdminSortConfig(data), logger),
-			utils_kratos_account_auth.NewMiddleware(newCheckAdminEditConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAdminOrNoAccConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAnonymousConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAdminConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAdminSortConfig(data), logger),
+			utils_kratos_auth_match.NewMiddleware(newCheckAdminEditConfig(data), logger),
 		),
 	}
 	if c.Grpc.Network != "" {
@@ -56,31 +56,31 @@ func NewGRPCServer(
 	return srv
 }
 
-func newCheckAdminOrNoAccConfig(data *data.Data) *utils_kratos_account_auth.Config {
-	return utils_kratos_account_auth.NewConfig("anonymous", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
+func newCheckAdminOrNoAccConfig(data *data.Data) *utils_kratos_auth_match.Config {
+	return utils_kratos_auth_match.NewConfig("anonymous", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
 		"/api.webnavigation.Ping/Ping",
 		"/api.webnavigation.Admin/CreateAdmin",
 	}, data.CheckAdminOrNoAccToken)
 }
 
-func newCheckAnonymousConfig(data *data.Data) *utils_kratos_account_auth.Config {
-	return utils_kratos_account_auth.NewConfig("login", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
+func newCheckAnonymousConfig(data *data.Data) *utils_kratos_auth_match.Config {
+	return utils_kratos_auth_match.NewConfig("login", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
 		"/api.webnavigation.Admin/AdminLogin",
 	}, data.CheckAnonymousToken)
 }
 
 // 把需要鉴权的操作列在这里
 // 开发者失误了没有把不同权限的操作放在不同的地方
-func newCheckAdminConfig(data *data.Data) *utils_kratos_account_auth.Config {
-	return utils_kratos_account_auth.NewConfig("get_admin", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
+func newCheckAdminConfig(data *data.Data) *utils_kratos_auth_match.Config {
+	return utils_kratos_auth_match.NewConfig("get_admin", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
 		"/api.webnavigation.Admin/GetAdmin",
 		"/api.webnavigation.Admin/ListAdmin",
 		"/api.webnavigation.Admin/ListAdminOfMine",
 	}, data.CheckAdminToken)
 }
 
-func newCheckAdminSortConfig(data *data.Data) *utils_kratos_account_auth.Config {
-	return utils_kratos_account_auth.NewConfig("sort", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
+func newCheckAdminSortConfig(data *data.Data) *utils_kratos_auth_match.Config {
+	return utils_kratos_auth_match.NewConfig("sort", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
 		"/api.webnavigation.Navi/SortNavi",
 		"/api.webnavigation.NaviLvl2/SortNaviLvl2",
 	}, func(ctx context.Context, token string) (context.Context, *errors.Error) {
@@ -99,8 +99,8 @@ func newCheckAdminSortConfig(data *data.Data) *utils_kratos_account_auth.Config 
 	})
 }
 
-func newCheckAdminEditConfig(data *data.Data) *utils_kratos_account_auth.Config {
-	return utils_kratos_account_auth.NewConfig("edit", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
+func newCheckAdminEditConfig(data *data.Data) *utils_kratos_auth_match.Config {
+	return utils_kratos_auth_match.NewConfig("edit", true, "admin_manage_token", true, []string{ //跳过鉴权的请求
 		"/api.webnavigation.Navi/CreateNavi",
 		"/api.webnavigation.Navi/DeleteNavi",
 		"/api.webnavigation.NaviLvl2/CreateNaviLvl2",
