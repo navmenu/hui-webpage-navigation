@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	pb "hui-webpage-navigation/api/webnavigation"
 	"hui-webpage-navigation/internal/conf"
 	"hui-webpage-navigation/internal/models"
 	"hui-webpage-navigation/internal/utils/utils_gorm/utils_gorm_mysql"
@@ -17,6 +18,7 @@ var ProviderSet = wire.NewSet(NewData, NewPingRepo)
 
 // Data .
 type Data struct {
+	cfg  *conf.Data
 	db   *gorm.DB
 	xlog *log.Helper
 }
@@ -33,6 +35,7 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 	}
 	// 自动迁移各种模型
 	err = db.AutoMigrate(
+		&models.Admin{},
 		&models.Navi{},
 		&models.NaviLvl2{},
 		&models.GuestSettings{},
@@ -52,6 +55,7 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 		}
 	}
 	return &Data{
+		cfg:  c,
 		db:   db,
 		xlog: xlog,
 	}, cleanup, nil
@@ -61,10 +65,35 @@ func (data *Data) DB() *gorm.DB {
 	return data.db
 }
 
-func (data *Data) CheckManageToken(ctx context.Context, token string) (context.Context, *errors.Error) {
-	//TODO 这里需要从DB里根据token/cookie查询管理员账号，但是没搞管理员系统，因此这里硬编码一下，稍后就改
-	if token != "123" {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "data.CheckManageToken return wrong")
+func (data *Data) CheckAdminOrNoAccToken(ctx context.Context, token string) (context.Context, *errors.Error) {
+	db := data.DB()
+	var count int64
+	if err := db.WithContext(ctx).Table(models.AdminTable).Count(&count).Error; err != nil {
+		return nil, pb.ErrorDbError("error=%v", err)
 	}
+	if count != 0 {
+		return data.CheckAdminToken(ctx, token)
+	} else {
+		return data.CheckAnonymousToken(ctx, token)
+	}
+}
+
+func (data *Data) CheckAnonymousToken(ctx context.Context, token string) (context.Context, *errors.Error) {
+	if token != data.cfg.AnonymousToken {
+		return nil, pb.ErrorAdminNotCreated("no admin")
+	}
+	return ctx, nil
+}
+
+func (data *Data) CheckAdminToken(ctx context.Context, token string) (context.Context, *errors.Error) {
+	db := data.DB()
+	var admin models.Admin
+	if err := db.WithContext(ctx).Table(models.AdminTable).Where("token=?", token).First(&admin).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, pb.ErrorAdminNotFound("error=%v", err)
+		}
+		return nil, pb.ErrorDbError("error=%v", err)
+	}
+	ctx = context.WithValue(ctx, models.Admin{}, &admin)
 	return ctx, nil
 }

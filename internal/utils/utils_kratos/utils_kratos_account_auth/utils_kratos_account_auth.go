@@ -12,22 +12,24 @@ import (
 )
 
 type Config struct {
-	enable     bool
-	key        string
-	include    bool
-	operations []string
-	check      CheckFunc
+	description string //这个权限的名称/或者描述
+	enable      bool
+	key         string
+	include     bool
+	operations  []string
+	check       CheckFunc
 }
 
 type CheckFunc func(ctx context.Context, token string) (context.Context, *errors.Error)
 
-func NewConfig(enable bool, key string, include bool, operations []string, check CheckFunc) *Config {
+func NewConfig(description string, enable bool, key string, include bool, operations []string, check CheckFunc) *Config {
 	return &Config{
-		enable:     enable,
-		key:        key,
-		include:    include,
-		operations: operations,
-		check:      check,
+		description: description,
+		enable:      enable,
+		key:         key,
+		include:     include,
+		operations:  operations,
+		check:       check,
 	}
 }
 
@@ -62,9 +64,9 @@ func matchFunc(cfg *Config, logger log.Logger) selector.MatchFunc {
 		exist := operationsMap[operation]
 		match := exist == cfg.include
 		if match {
-			xlog.Debugf("operation=%s exist=%v include=%v match=%v must check auth", operation, exist, cfg.include, match)
+			xlog.Debugf("operation=%s exist=%v include=%v match=%v must check description=%v auth", operation, exist, cfg.include, match, cfg.description)
 		} else {
-			xlog.Debugf("operation=%s exist=%v include=%v match=%v skip check auth", operation, exist, cfg.include, match)
+			xlog.Debugf("operation=%s exist=%v include=%v match=%v skip check description=%v auth", operation, exist, cfg.include, match, cfg.description)
 		}
 		return match
 	}

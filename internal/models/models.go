@@ -1,5 +1,24 @@
 package models
 
+const AdminTable = "admin"
+
+type Admin struct {
+	ID             uint64 `gorm:"primary_key" json:"id"`
+	Username       string `gorm:"unique" json:"username,omitempty"`
+	Password       string `json:"password,omitempty"`
+	Nickname       string `json:"nickname,omitempty"`
+	CanCreateAdmin bool   `json:"can_create_admin,omitempty"`
+	CanSelectAdmin bool   `json:"can_select_admin,omitempty"`
+	CanEdit        bool   `json:"can_edit,omitempty"`
+	CanSort        bool   `json:"can_sort,omitempty"`
+	Token          string `gorm:"unique" json:"token,omitempty"`
+	CreatedByUname string `gorm:"index" json:"created_by_uname,omitempty"`
+}
+
+func (*Admin) TableName() string {
+	return AdminTable
+}
+
 const NaviTable = "navis"
 
 type Navi struct {

@@ -32,4 +32,5 @@ message Data {
     bool echo = 3;
   }
   Database database = 1;
+  string anonymous_token = 2;
 }

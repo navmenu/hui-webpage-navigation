@@ -15,8 +15,11 @@ enum ErrorReason {
 	UNKNOWN = 0 [(errors.code) = 400];
 	MISSING_PARAM = 10000  [(errors.code) = 400];
 	BAD_PARAM = 10001  [(errors.code) = 400];
-	USER_NOT_FOUND = 10002 [(errors.code) = 404];
 	ALREADY_EXIST = 10003 [(errors.code) = 400];
 	NOT_EXIST = 10004 [(errors.code) = 404];
 	DB_ERROR = 10005 [(errors.code) = 500];
+
+	ADMIN_NOT_FOUND = 11000 [(errors.code) = 401];
+	ADMIN_NOT_CREATED = 11001 [(errors.code) = 204];
+	ADMIN_NO_PERMISSION = 11002 [(errors.code) = 403];
 }

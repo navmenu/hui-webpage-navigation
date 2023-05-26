@@ -19,6 +19,7 @@ func NewHTTPServer(
 	c *conf.Server,
 	data *data.Data,
 	pingService *service.PingService,
+	adminService *service.AdminService,
 	naviService *service.NaviService,
 	naviLvl2Service *service.NaviLvl2Service,
 	logger log.Logger,
@@ -28,6 +29,8 @@ func NewHTTPServer(
 			recovery.Recovery(),
 			tracing.Server(),
 			logging.Server(logger),
+			utils_kratos_account_auth.NewMiddleware(newCheckAdminOrNoAccConfig(data), logger),
+			utils_kratos_account_auth.NewMiddleware(newCheckAnonymousConfig(data), logger),
 			utils_kratos_account_auth.NewMiddleware(newCheckAdminConfig(data), logger),
 		),
 	}
@@ -42,6 +45,7 @@ func NewHTTPServer(
 	}
 	srv := http.NewServer(opts...)
 	webnavigation.RegisterPingHTTPServer(srv, pingService)
+	webnavigation.RegisterAdminHTTPServer(srv, adminService)
 	webnavigation.RegisterNaviHTTPServer(srv, naviService)
 	webnavigation.RegisterNaviLvl2HTTPServer(srv, naviLvl2Service)
 	return srv

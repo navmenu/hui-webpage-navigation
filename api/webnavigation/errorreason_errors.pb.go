@@ -47,18 +47,6 @@ func ErrorBadParam(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, ErrorReason_BAD_PARAM.String(), fmt.Sprintf(format, args...))
 }
 
-func IsUserNotFound(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == ErrorReason_USER_NOT_FOUND.String() && e.Code == 404
-}
-
-func ErrorUserNotFound(format string, args ...interface{}) *errors.Error {
-	return errors.New(404, ErrorReason_USER_NOT_FOUND.String(), fmt.Sprintf(format, args...))
-}
-
 func IsAlreadyExist(err error) bool {
 	if err == nil {
 		return false
@@ -93,4 +81,40 @@ func IsDbError(err error) bool {
 
 func ErrorDbError(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, ErrorReason_DB_ERROR.String(), fmt.Sprintf(format, args...))
+}
+
+func IsAdminNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ADMIN_NOT_FOUND.String() && e.Code == 401
+}
+
+func ErrorAdminNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, ErrorReason_ADMIN_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsAdminNotCreated(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ADMIN_NOT_CREATED.String() && e.Code == 204
+}
+
+func ErrorAdminNotCreated(format string, args ...interface{}) *errors.Error {
+	return errors.New(204, ErrorReason_ADMIN_NOT_CREATED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsAdminNoPermission(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ADMIN_NO_PERMISSION.String() && e.Code == 403
+}
+
+func ErrorAdminNoPermission(format string, args ...interface{}) *errors.Error {
+	return errors.New(403, ErrorReason_ADMIN_NO_PERMISSION.String(), fmt.Sprintf(format, args...))
 }

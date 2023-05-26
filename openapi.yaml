@@ -6,6 +6,42 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/web-navigation/v1/admin_login:
+        post:
+            tags:
+                - Admin
+            operationId: Admin_AdminLogin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.AdminLoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.AdminLoginReply'
+    /api/web-navigation/v1/create_admin:
+        post:
+            tags:
+                - Admin
+            operationId: Admin_CreateAdmin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.CreateAdminRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.CreateAdminReply'
     /api/web-navigation/v1/create_navi:
         post:
             tags:
@@ -44,6 +80,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.webnavigation.CreateNaviLvl2Reply'
+    /api/web-navigation/v1/delete_admin:
+        post:
+            tags:
+                - Admin
+            operationId: Admin_DeleteAdmin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.DeleteAdminRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.DeleteAdminReply'
     /api/web-navigation/v1/delete_navi:
         post:
             tags:
@@ -82,6 +136,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.webnavigation.DeleteNaviLvl2Reply'
+    /api/web-navigation/v1/get_admin:
+        get:
+            tags:
+                - Admin
+            operationId: Admin_GetAdmin
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.GetAdminReply'
     /api/web-navigation/v1/get_guest_settings:
         get:
             tags:
@@ -101,6 +167,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.webnavigation.GetGuestSettingsReply'
+    /api/web-navigation/v1/list_admin:
+        get:
+            tags:
+                - Admin
+            operationId: Admin_ListAdmin
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.ListAdminReply'
+    /api/web-navigation/v1/list_admin_of_mine:
+        get:
+            tags:
+                - Admin
+            operationId: Admin_ListAdminOfMine
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.ListAdminReply'
     /api/web-navigation/v1/list_navi:
         get:
             tags:
@@ -210,8 +300,82 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.webnavigation.SortNaviLvl2Reply'
+    /api/web-navigation/v1/update_admin:
+        post:
+            tags:
+                - Admin
+            operationId: Admin_UpdateAdmin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.webnavigation.UpdateAdminRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.UpdateAdminReply'
 components:
     schemas:
+        api.webnavigation.AdminListItem:
+            type: object
+            properties:
+                username:
+                    type: string
+                nickname:
+                    type: string
+                permissions:
+                    type: object
+                    additionalProperties:
+                        type: boolean
+                createdByUname:
+                    type: string
+        api.webnavigation.AdminLoginReply:
+            type: object
+            properties:
+                username:
+                    type: string
+                nickname:
+                    type: string
+                token:
+                    type: string
+                expireAtNs:
+                    type: integer
+                    format: int64
+        api.webnavigation.AdminLoginRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+        api.webnavigation.CreateAdminReply:
+            type: object
+            properties:
+                username:
+                    type: string
+                nickname:
+                    type: string
+        api.webnavigation.CreateAdminRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+                nickname:
+                    type: string
+                canCreateAdmin:
+                    type: boolean
+                canSelectAdmin:
+                    type: boolean
+                canEdit:
+                    type: boolean
+                canSort:
+                    type: boolean
         api.webnavigation.CreateNaviLvl2Reply:
             type: object
             properties:
@@ -242,6 +406,12 @@ components:
             properties:
                 name:
                     type: string
+        api.webnavigation.DeleteAdminReply:
+            type: object
+            properties: {}
+        api.webnavigation.DeleteAdminRequest:
+            type: object
+            properties: {}
         api.webnavigation.DeleteNaviLvl2Reply:
             type: object
             properties: {}
@@ -262,11 +432,29 @@ components:
                     type: string
                 force:
                     type: boolean
+        api.webnavigation.GetAdminReply:
+            type: object
+            properties:
+                username:
+                    type: string
+                nickname:
+                    type: string
+                permissions:
+                    type: object
+                    additionalProperties:
+                        type: boolean
         api.webnavigation.GetGuestSettingsReply:
             type: object
             properties:
                 isNotRemindInfo:
                     type: boolean
+        api.webnavigation.ListAdminReply:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.webnavigation.AdminListItem'
         api.webnavigation.ListNaviLvl2Reply:
             type: object
             properties:
@@ -374,6 +562,12 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.webnavigation.SortNaviItem'
+        api.webnavigation.UpdateAdminReply:
+            type: object
+            properties: {}
+        api.webnavigation.UpdateAdminRequest:
+            type: object
+            properties: {}
         google.protobuf.StringValue:
             type: object
             properties:
@@ -382,6 +576,7 @@ components:
                     description: The string value.
             description: Wrapper message for `string`. The JSON representation for `StringValue` is JSON string.
 tags:
+    - name: Admin
     - name: Navi
     - name: NaviLvl2
     - name: Ping

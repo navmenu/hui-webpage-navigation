@@ -10,10 +10,4 @@ data:
     driver: mysql
     source: "root:123456@tcp(host.docker.internal:3306)/HuiWebpageNavigation?charset=utf8mb4&parseTime=True&loc=Local"
     echo: true
-  auth:
-    enable: true
-    key: "Authorization"
-    tokens: # map key:username value:token
-      "ADMIN_123": "123"
-      "ADMIN_abc": "abc"
-      "ADMIN_XXX": "80f59c14b161429b88d9068d8cddca32"
+  anonymous_token: "abc"

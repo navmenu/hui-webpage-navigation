@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package api.webnavigation;
+
+option go_package = "hui-webpage-navigation/api/webnavigation;webnavigation";
+option java_multiple_files = true;
+option java_package = "api.webnavigation";
+
+import "google/api/annotations.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "errors/errors.proto";
+
+service Admin {
+  rpc CreateAdmin (CreateAdminRequest) returns (CreateAdminReply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/create_admin"
+      body: "*"
+    };
+  }
+  rpc AdminLogin (AdminLoginRequest) returns (AdminLoginReply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/admin_login"
+      body: "*"
+    };
+  }
+  rpc UpdateAdmin (UpdateAdminRequest) returns (UpdateAdminReply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/update_admin"
+      body: "*"
+    };
+  }
+  rpc DeleteAdmin (DeleteAdminRequest) returns (DeleteAdminReply) {
+    option (google.api.http) = {
+      post: "/api/web-navigation/v1/delete_admin"
+      body: "*"
+    };
+  }
+  rpc GetAdmin (GetAdminRequest) returns (GetAdminReply) {
+    option (google.api.http) = {
+      get: "/api/web-navigation/v1/get_admin"
+    };
+  }
+  rpc ListAdmin (ListAdminRequest) returns (ListAdminReply) {
+    option (google.api.http) = {
+      get: "/api/web-navigation/v1/list_admin"
+    };
+  }
+  rpc ListAdminOfMine (ListAdminRequest) returns (ListAdminReply) {
+    option (google.api.http) = {
+      get: "/api/web-navigation/v1/list_admin_of_mine"
+    };
+  }
+}
+
+message CreateAdminRequest {
+  string username = 1;
+  string password = 2;
+  string nickname = 3;
+  bool can_create_admin = 4;
+  bool can_select_admin = 5;
+  bool can_edit = 6;
+  bool can_sort = 7;
+}
+message CreateAdminReply {
+  string username = 1;
+  string nickname = 2;
+}
+
+message AdminLoginRequest{
+  string username = 1;
+  string password = 2;
+}
+message AdminLoginReply{
+  string username = 1;
+  string nickname = 2;
+  string token = 3;
+  int64 expire_at_ns = 4;
+}
+
+message UpdateAdminRequest {}
+message UpdateAdminReply {}
+
+message DeleteAdminRequest {}
+message DeleteAdminReply {}
+
+message GetAdminRequest {}
+message GetAdminReply {
+  string username = 1;
+  string nickname = 2;
+  map<string, bool> permissions = 3;
+}
+
+message ListAdminRequest {}
+message ListAdminReply {
+  repeated AdminListItem items = 1;
+}
+
+message AdminListItem {
+  string username = 1;
+  string nickname = 2;
+  map<string, bool> permissions = 3;
+  string created_by_uname = 4;
+}
