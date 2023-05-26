@@ -5,7 +5,7 @@ import (
 	pb "hui-webpage-navigation/api/webnavigation"
 	"hui-webpage-navigation/internal/biz"
 	"hui-webpage-navigation/internal/models"
-	"hui-webpage-navigation/internal/utils/utils_kratos"
+	"hui-webpage-navigation/internal/utils/utils_kratos/utils_kratos"
 	"unicode/utf8"
 
 	"github.com/barweiss/go-tuple"
