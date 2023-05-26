@@ -74,21 +74,21 @@ func matchFunc(cfg *Config, logger log.Logger) selector.MatchFunc {
 
 func middlewareFunc(cfg *Config, logger log.Logger) middleware.Middleware {
 	xlog := log.NewHelper(logger)
-	xlog.Infof("new check_account_token_pass.middleware enable=%v key=%v operations=%v include=%v", cfg.enable, cfg.key, len(cfg.operations), cfg.include)
+	xlog.Infof("new utils_kratos_auth_match.middleware enable=%v key=%v operations=%v include=%v", cfg.enable, cfg.key, len(cfg.operations), cfg.include)
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
 			if !cfg.enable {
-				xlog.Infof("check_account_token_pass: cfg.enable=false anonymous pass")
+				xlog.Infof("utils_kratos_auth_match: cfg.enable=false anonymous pass")
 				return handler(ctx, req)
 			}
 			if tp, ok := transport.FromServerContext(ctx); ok {
 				tx := apm.TransactionFromContext(ctx)
-				sp := tx.StartSpan("check_account_token_pass", "auth", nil)
+				sp := tx.StartSpan("utils_kratos_auth_match", "auth", nil)
 				defer sp.End()
 
 				token := tp.RequestHeader().Get(cfg.key)
 				if token == "" {
-					return nil, errors.Unauthorized("UNAUTHORIZED", "check_account_token_pass: auth token is missing")
+					return nil, errors.Unauthorized("UNAUTHORIZED", "utils_kratos_auth_match: auth token is missing")
 				}
 				ctx, erk := cfg.check(ctx, token)
 				if erk != nil {
@@ -96,7 +96,7 @@ func middlewareFunc(cfg *Config, logger log.Logger) middleware.Middleware {
 				}
 				return handler(ctx, req)
 			}
-			return nil, errors.Unauthorized("UNAUTHORIZED", "check_account_token_pass: wrong context for middleware")
+			return nil, errors.Unauthorized("UNAUTHORIZED", "utils_kratos_auth_match: wrong context for middleware")
 		}
 	}
 }
