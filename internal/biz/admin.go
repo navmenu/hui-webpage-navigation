@@ -59,7 +59,7 @@ func (uc *AdminUsecase) CreateAdmin(ctx context.Context, req *pb.CreateAdminRequ
 		CanSelectAdmin: canSelectAdmin,
 		CanEdit:        canEdit,
 		CanSort:        canSort,
-		Token:          "",
+		Token:          utils_uuid.NewUUID(), //随机个token避免空值的重复
 		CreatedByUname: createdByUname,
 	}
 	if err := db.WithContext(ctx).Table(models.AdminTable).Create(newAdmin).Error; err != nil {
