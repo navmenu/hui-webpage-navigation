@@ -32,6 +32,8 @@ func NewHTTPServer(
 			utils_kratos_account_auth.NewMiddleware(newCheckAdminOrNoAccConfig(data), logger),
 			utils_kratos_account_auth.NewMiddleware(newCheckAnonymousConfig(data), logger),
 			utils_kratos_account_auth.NewMiddleware(newCheckAdminConfig(data), logger),
+			utils_kratos_account_auth.NewMiddleware(newCheckAdminSortConfig(data), logger),
+			utils_kratos_account_auth.NewMiddleware(newCheckAdminEditConfig(data), logger),
 		),
 	}
 	if c.Http.Network != "" {
