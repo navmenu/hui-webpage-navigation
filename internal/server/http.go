@@ -12,6 +12,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/gorilla/handlers"
 )
 
 // NewHTTPServer new an HTTP server.
@@ -46,6 +47,10 @@ func NewHTTPServer(
 	if c.Http.Timeout != nil {
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
+	opts = append(opts, http.Filter(handlers.CORS(
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedMethods([]string{"GET", "POST"}),
+	)))
 	srv := http.NewServer(opts...)
 	webnavigation.RegisterPingHTTPServer(srv, pingService)
 	webnavigation.RegisterAdminHTTPServer(srv, adminService)
