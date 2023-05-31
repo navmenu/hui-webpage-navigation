@@ -43,14 +43,14 @@ func NewHTTPServer(
 	}
 	if c.Http.Addr != "" {
 		opts = append(opts, http.Address(c.Http.Addr))
+		opts = append(opts, http.Filter(handlers.CORS(
+			handlers.AllowedOrigins([]string{"*"}),
+			handlers.AllowedMethods([]string{"GET", "POST"}),
+		)))
 	}
 	if c.Http.Timeout != nil {
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
-	opts = append(opts, http.Filter(handlers.CORS(
-		handlers.AllowedOrigins([]string{"*"}),
-		handlers.AllowedMethods([]string{"GET", "POST"}),
-	)))
 	srv := http.NewServer(opts...)
 	webnavigation.RegisterPingHTTPServer(srv, pingService)
 	webnavigation.RegisterAdminHTTPServer(srv, adminService)
