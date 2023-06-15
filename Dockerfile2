@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN echo "make sure the executable file match the image arch"
 COPY ./bin/hui-webpage-navigation /app/
+RUN echo "copy done"
 
 WORKDIR /app
 
