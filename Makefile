@@ -62,7 +62,7 @@ build:
 build_linux:
 	mkdir -p bin/ && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ ./...
 
-# build_linux 禁用CGO
+# build_linux 启用CGO
 build_linux_cgo:
 	mkdir -p bin/ && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ ./...
 
