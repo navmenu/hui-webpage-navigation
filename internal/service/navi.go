@@ -71,6 +71,15 @@ func (s *NaviService) SortNavi(ctx context.Context, req *pb.SortNaviRequest) (*p
 	}
 	return &pb.SortNaviReply{}, nil
 }
+func (s *NaviService) GetNaviOrders(ctx context.Context, req *pb.GetNaviOrdersRequest) (*pb.GetNaviOrdersReply, error) {
+	navis, erk := s.uc.GetNaviOrders(ctx, req)
+	if erk != nil {
+		return nil, erk
+	}
+	return &pb.GetNaviOrdersReply{
+		Navis: navis2pb(navis),
+	}, nil
+}
 func (s *NaviService) ListNavi(ctx context.Context, req *pb.ListNaviRequest) (*pb.ListNaviReply, error) {
 	res, erk := s.uc.ListNavi(ctx, req)
 	if erk != nil {
@@ -93,18 +102,30 @@ func naviTuple2pbs(a []*tuple.T2[*models.Navi, []*models.NaviLvl2]) []*pb.NaviLi
 
 func naviTuple2pb(x *tuple.T2[*models.Navi, []*models.NaviLvl2]) *pb.NaviListItemType {
 	return &pb.NaviListItemType{
-		Navi:      navi2pb(x),
+		Navi:      naviTv1x2pb(x),
 		NaviLvl2S: naviLvl2resp2pbs(x.V2),
 	}
 }
 
-func navi2pb(x *tuple.T2[*models.Navi, []*models.NaviLvl2]) *pb.NaviType {
+func naviTv1x2pb(x *tuple.T2[*models.Navi, []*models.NaviLvl2]) *pb.NaviType {
+	return navi2pb(x.V1)
+}
+
+func navi2pb(navi *models.Navi) *pb.NaviType {
 	return &pb.NaviType{
-		Id:         x.V1.ID,
-		Name:       x.V1.Name,
-		Sort:       x.V1.Sort,
-		ParentNvid: x.V1.ParentNvid,
+		Id:         navi.ID,
+		Name:       navi.Name,
+		Sort:       navi.Sort,
+		ParentNvid: navi.ParentNvid,
 	}
+}
+
+func navis2pb(navis []*models.Navi) []*pb.NaviType {
+	var res = make([]*pb.NaviType, 0, len(navis))
+	for _, a := range navis {
+		res = append(res, navi2pb(a))
+	}
+	return res
 }
 
 func naviLvl2resp2pbs(a []*models.NaviLvl2) []*pb.NaviLvl2Item {
@@ -133,7 +154,10 @@ func navisToLayers(slice []*pb.NaviListItemType) []*pb.NaviListItemType {
 			mp[k] = append(mp[k], v)
 		}
 	}
-	//这里最好是像这样，两个循环，第一个组成map，第二个收集结果，否的会出错
+	for _, v := range slice {
+		v.NextNavis = mp[v.Navi.Id]
+	}
+	//这里最好是像这样，三个循环，第一个组成map，第二个收集结果，第三个是收集树根，否的会出错
 	var resTopLayers []*pb.NaviListItemType
 	for _, v := range slice {
 		if v.Navi.ParentNvid == 0 {

@@ -167,6 +167,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.webnavigation.GetGuestSettingsReply'
+    /api/web-navigation/v1/get_navi_orders:
+        get:
+            tags:
+                - Navi
+            description: 获得分类的顺序
+            operationId: Navi_GetNaviOrders
+            parameters:
+                - name: parentNvid
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint64
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.webnavigation.GetNaviOrdersReply'
     /api/web-navigation/v1/list_admin:
         get:
             tags:
@@ -451,6 +470,13 @@ components:
             properties:
                 isNotRemindInfo:
                     type: boolean
+        api.webnavigation.GetNaviOrdersReply:
+            type: object
+            properties:
+                navis:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.webnavigation.NaviType'
         api.webnavigation.ListAdminReply:
             type: object
             properties:

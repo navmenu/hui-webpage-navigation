@@ -37,6 +37,12 @@ service Navi {
       body: "*"
     };
   }
+  // 获得分类的顺序
+  rpc GetNaviOrders(GetNaviOrdersRequest) returns (GetNaviOrdersReply) {
+    option (google.api.http) = {
+      get: "/api/web-navigation/v1/get_navi_orders"
+    };
+  }
   // 分类列表，目前看来获得分类列表的时候必然要获得内容，因此一起返回，假如不需要可以再改
   rpc ListNavi(ListNaviRequest) returns (ListNaviReply) {
     option (google.api.http) = {
@@ -95,6 +101,13 @@ message SortNaviRequest {
   repeated SortNaviItem items = 1;  // 把带序号的列表发过来
 }
 message SortNaviReply {}
+
+message GetNaviOrdersRequest {
+  uint64 parent_nvid = 1;  // 父类编号，只取这一个父类下面的分类列表
+}
+message GetNaviOrdersReply {
+  repeated NaviType navis = 1;
+}
 
 message NaviLvl2Item {
   string navi_name = 1;  // 分类名称

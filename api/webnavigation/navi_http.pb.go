@@ -22,6 +22,7 @@ const _ = http.SupportPackageIsVersion1
 const OperationNaviCreateNavi = "/api.webnavigation.Navi/CreateNavi"
 const OperationNaviDeleteNavi = "/api.webnavigation.Navi/DeleteNavi"
 const OperationNaviGetGuestSettings = "/api.webnavigation.Navi/GetGuestSettings"
+const OperationNaviGetNaviOrders = "/api.webnavigation.Navi/GetNaviOrders"
 const OperationNaviListNavi = "/api.webnavigation.Navi/ListNavi"
 const OperationNaviSetNotRemindInfo = "/api.webnavigation.Navi/SetNotRemindInfo"
 const OperationNaviSortNavi = "/api.webnavigation.Navi/SortNavi"
@@ -38,6 +39,8 @@ type NaviHTTPServer interface {
 	// - 即使没有设置，也会返回一个默认值的结果，比如false和0等
 	// - 需要在请求里带cookie
 	GetGuestSettings(context.Context, *GetGuestSettingsRequest) (*GetGuestSettingsReply, error)
+	// GetNaviOrders 获得分类的顺序
+	GetNaviOrders(context.Context, *GetNaviOrdersRequest) (*GetNaviOrdersReply, error)
 	// ListNavi 分类列表，目前看来获得分类列表的时候必然要获得内容，因此一起返回，假如不需要可以再改
 	ListNavi(context.Context, *ListNaviRequest) (*ListNaviReply, error)
 	// SetNotRemindInfo 设置不再提醒
@@ -53,6 +56,7 @@ func RegisterNaviHTTPServer(s *http.Server, srv NaviHTTPServer) {
 	r.POST("/api/web-navigation/v1/create_navi", _Navi_CreateNavi0_HTTP_Handler(srv))
 	r.POST("/api/web-navigation/v1/delete_navi", _Navi_DeleteNavi0_HTTP_Handler(srv))
 	r.POST("/api/web-navigation/v1/sort_navi", _Navi_SortNavi0_HTTP_Handler(srv))
+	r.GET("/api/web-navigation/v1/get_navi_orders", _Navi_GetNaviOrders0_HTTP_Handler(srv))
 	r.GET("/api/web-navigation/v1/list_navi", _Navi_ListNavi0_HTTP_Handler(srv))
 	r.GET("/api/web-navigation/v1/get_guest_settings", _Navi_GetGuestSettings0_HTTP_Handler(srv))
 	r.POST("/api/web-navigation/v1/set_not_remind_info", _Navi_SetNotRemindInfo0_HTTP_Handler(srv))
@@ -111,6 +115,25 @@ func _Navi_SortNavi0_HTTP_Handler(srv NaviHTTPServer) func(ctx http.Context) err
 			return err
 		}
 		reply := out.(*SortNaviReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Navi_GetNaviOrders0_HTTP_Handler(srv NaviHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetNaviOrdersRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationNaviGetNaviOrders)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetNaviOrders(ctx, req.(*GetNaviOrdersRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetNaviOrdersReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -176,6 +199,7 @@ type NaviHTTPClient interface {
 	CreateNavi(ctx context.Context, req *CreateNaviRequest, opts ...http.CallOption) (rsp *CreateNaviReply, err error)
 	DeleteNavi(ctx context.Context, req *DeleteNaviRequest, opts ...http.CallOption) (rsp *DeleteNaviReply, err error)
 	GetGuestSettings(ctx context.Context, req *GetGuestSettingsRequest, opts ...http.CallOption) (rsp *GetGuestSettingsReply, err error)
+	GetNaviOrders(ctx context.Context, req *GetNaviOrdersRequest, opts ...http.CallOption) (rsp *GetNaviOrdersReply, err error)
 	ListNavi(ctx context.Context, req *ListNaviRequest, opts ...http.CallOption) (rsp *ListNaviReply, err error)
 	SetNotRemindInfo(ctx context.Context, req *SetNotRemindInfoRequest, opts ...http.CallOption) (rsp *SetNotRemindInfoReply, err error)
 	SortNavi(ctx context.Context, req *SortNaviRequest, opts ...http.CallOption) (rsp *SortNaviReply, err error)
@@ -220,6 +244,19 @@ func (c *NaviHTTPClientImpl) GetGuestSettings(ctx context.Context, in *GetGuestS
 	pattern := "/api/web-navigation/v1/get_guest_settings"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationNaviGetGuestSettings))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *NaviHTTPClientImpl) GetNaviOrders(ctx context.Context, in *GetNaviOrdersRequest, opts ...http.CallOption) (*GetNaviOrdersReply, error) {
+	var out GetNaviOrdersReply
+	pattern := "/api/web-navigation/v1/get_navi_orders"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationNaviGetNaviOrders))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

@@ -105,6 +105,7 @@ func newCheckConfig(data *data.Data) *utils_kratos_auth_matchs.Config {
 		},
 		{
 			V1: []string{
+				webnavigation.OperationNaviGetNaviOrders,
 				"/api.webnavigation.Navi/SortNavi",
 				"/api.webnavigation.NaviLvl2/SortNaviLvl2",
 			},

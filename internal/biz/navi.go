@@ -155,6 +155,17 @@ func (uc *NaviUsecase) SortNavi(ctx context.Context, req *pb.SortNaviRequest) *e
 	return nil
 }
 
+func (uc *NaviUsecase) GetNaviOrders(ctx context.Context, req *pb.GetNaviOrdersRequest) ([]*models.Navi, *errors.Error) {
+	db := uc.data.DB()
+	var navis []*models.Navi
+	qs := db.WithContext(ctx).Table(models.NaviTable).Order("navis.sort")
+	qs = qs.Where("parent_nvid=?", req.ParentNvid)
+	if err := qs.Find(&navis).Error; err != nil {
+		return nil, pb.ErrorDbError("error=%v", err)
+	}
+	return navis, nil
+}
+
 func (uc *NaviUsecase) ListNavi(ctx context.Context, req *pb.ListNaviRequest) ([]*tuple.T2[*models.Navi, []*models.NaviLvl2], *errors.Error) {
 	db := uc.data.DB()
 	var navis []*models.Navi

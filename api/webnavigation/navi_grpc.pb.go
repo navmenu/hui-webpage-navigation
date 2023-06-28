@@ -22,6 +22,7 @@ const (
 	Navi_CreateNavi_FullMethodName       = "/api.webnavigation.Navi/CreateNavi"
 	Navi_DeleteNavi_FullMethodName       = "/api.webnavigation.Navi/DeleteNavi"
 	Navi_SortNavi_FullMethodName         = "/api.webnavigation.Navi/SortNavi"
+	Navi_GetNaviOrders_FullMethodName    = "/api.webnavigation.Navi/GetNaviOrders"
 	Navi_ListNavi_FullMethodName         = "/api.webnavigation.Navi/ListNavi"
 	Navi_GetGuestSettings_FullMethodName = "/api.webnavigation.Navi/GetGuestSettings"
 	Navi_SetNotRemindInfo_FullMethodName = "/api.webnavigation.Navi/SetNotRemindInfo"
@@ -37,6 +38,8 @@ type NaviClient interface {
 	DeleteNavi(ctx context.Context, in *DeleteNaviRequest, opts ...grpc.CallOption) (*DeleteNaviReply, error)
 	// 分类排序，策略是把新的顺序完整的发过来，假如需要其它策略可以再改代码
 	SortNavi(ctx context.Context, in *SortNaviRequest, opts ...grpc.CallOption) (*SortNaviReply, error)
+	// 获得分类的顺序
+	GetNaviOrders(ctx context.Context, in *GetNaviOrdersRequest, opts ...grpc.CallOption) (*GetNaviOrdersReply, error)
 	// 分类列表，目前看来获得分类列表的时候必然要获得内容，因此一起返回，假如不需要可以再改
 	ListNavi(ctx context.Context, in *ListNaviRequest, opts ...grpc.CallOption) (*ListNaviReply, error)
 	// 获取用户设置
@@ -87,6 +90,15 @@ func (c *naviClient) SortNavi(ctx context.Context, in *SortNaviRequest, opts ...
 	return out, nil
 }
 
+func (c *naviClient) GetNaviOrders(ctx context.Context, in *GetNaviOrdersRequest, opts ...grpc.CallOption) (*GetNaviOrdersReply, error) {
+	out := new(GetNaviOrdersReply)
+	err := c.cc.Invoke(ctx, Navi_GetNaviOrders_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *naviClient) ListNavi(ctx context.Context, in *ListNaviRequest, opts ...grpc.CallOption) (*ListNaviReply, error) {
 	out := new(ListNaviReply)
 	err := c.cc.Invoke(ctx, Navi_ListNavi_FullMethodName, in, out, opts...)
@@ -124,6 +136,8 @@ type NaviServer interface {
 	DeleteNavi(context.Context, *DeleteNaviRequest) (*DeleteNaviReply, error)
 	// 分类排序，策略是把新的顺序完整的发过来，假如需要其它策略可以再改代码
 	SortNavi(context.Context, *SortNaviRequest) (*SortNaviReply, error)
+	// 获得分类的顺序
+	GetNaviOrders(context.Context, *GetNaviOrdersRequest) (*GetNaviOrdersReply, error)
 	// 分类列表，目前看来获得分类列表的时候必然要获得内容，因此一起返回，假如不需要可以再改
 	ListNavi(context.Context, *ListNaviRequest) (*ListNaviReply, error)
 	// 获取用户设置
@@ -152,6 +166,9 @@ func (UnimplementedNaviServer) DeleteNavi(context.Context, *DeleteNaviRequest) (
 }
 func (UnimplementedNaviServer) SortNavi(context.Context, *SortNaviRequest) (*SortNaviReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SortNavi not implemented")
+}
+func (UnimplementedNaviServer) GetNaviOrders(context.Context, *GetNaviOrdersRequest) (*GetNaviOrdersReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNaviOrders not implemented")
 }
 func (UnimplementedNaviServer) ListNavi(context.Context, *ListNaviRequest) (*ListNaviReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListNavi not implemented")
@@ -229,6 +246,24 @@ func _Navi_SortNavi_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Navi_GetNaviOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNaviOrdersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NaviServer).GetNaviOrders(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Navi_GetNaviOrders_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NaviServer).GetNaviOrders(ctx, req.(*GetNaviOrdersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Navi_ListNavi_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListNaviRequest)
 	if err := dec(in); err != nil {
@@ -301,6 +336,10 @@ var Navi_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SortNavi",
 			Handler:    _Navi_SortNavi_Handler,
+		},
+		{
+			MethodName: "GetNaviOrders",
+			Handler:    _Navi_GetNaviOrders_Handler,
 		},
 		{
 			MethodName: "ListNavi",
