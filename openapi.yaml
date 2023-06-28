@@ -528,6 +528,9 @@ components:
                 sort:
                     type: integer
                     format: int32
+                parentId:
+                    type: integer
+                    format: uint64
         api.webnavigation.SetNotRemindInfoReply:
             type: object
             properties: {}

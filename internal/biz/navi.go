@@ -40,13 +40,36 @@ func (uc *NaviUsecase) CreateNavi(ctx context.Context, req *pb.CreateNaviRequest
 	if err := db.WithContext(ctx).Table(models.NaviTable).Select("COALESCE(MAX(navis.sort), -1)").Scan(&maxIndex).Error; err != nil {
 		return nil, pb.ErrorDbError("error=%v", err)
 	}
-	newIndex := maxIndex + 1
 	var navi = &models.Navi{
-		ID:   0,
-		Name: req.Name,
-		Sort: int32(newIndex),
+		ID:       0,
+		Name:     req.Name,
+		Sort:     int32(maxIndex + 1),
+		ParentID: req.ParentId,
 	}
-	if err := db.WithContext(ctx).Table(models.NaviTable).Create(navi).Error; err != nil {
+	var erk *errors.Error
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		if navi.ParentID != 0 {
+			var parentNavi models.Navi
+			if err := db.WithContext(ctx).Table(models.NaviTable).
+				Clauses(clause.Locking{Strength: "UPDATE"}).
+				Where("id=?", navi.ParentID).First(&parentNavi).Error; err != nil {
+				if err == gorm.ErrRecordNotFound {
+					erk = pb.ErrorNotExist("navi id=%v not exist", navi.ParentID)
+					return erk
+				} else {
+					erk = pb.ErrorDbError("error=%v", err)
+					return erk
+				}
+			}
+		}
+		if err := db.WithContext(ctx).Table(models.NaviTable).Create(navi).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		if erk != nil {
+			return nil, erk
+		}
 		return nil, pb.ErrorDbError("error=%v", err)
 	}
 	return navi, nil
@@ -65,6 +88,19 @@ func (uc *NaviUsecase) DeleteNavi(ctx context.Context, req *pb.DeleteNaviRequest
 				return erk
 			} else {
 				erk = pb.ErrorDbError("error=%v", err)
+				return erk
+			}
+		}
+		//检查分类是否底下还有分类
+		{
+			var cnt int64
+			if err := db.WithContext(ctx).Table(models.NaviTable).
+				Where("parent_id=?", navi.ID).Count(&cnt).Error; err != nil {
+				erk = pb.ErrorDbError("error=%v", err)
+				return erk
+			}
+			if cnt > 0 {
+				erk = pb.ErrorAlreadyExist("next_navis cnt=%v > 0", cnt)
 				return erk
 			}
 		}

@@ -75,8 +75,9 @@ message CreateNaviReply {
 
 message NaviType {
   uint64 id = 1;
-  string name = 2;  // 分类名称
-  int32 sort = 3;   // 排序序号，按照程序下标的规则，第一个的序号是0
+  string name = 2;       // 分类名称
+  int32 sort = 3;        // 排序序号，按照程序下标的规则，第一个的序号是0
+  uint64 parent_id = 4;  // 父亲编号
 }
 
 message DeleteNaviRequest {
