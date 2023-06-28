@@ -34,7 +34,7 @@ type CreateNaviRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	Name     string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                          // 分类名称
-	ParentId uint64 `protobuf:"varint,2,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"` //父亲编号，这样让分类具有层级
+	ParentId uint64 `protobuf:"varint,2,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"` // 父亲编号，这样让分类具有层级
 }
 
 func (x *CreateNaviRequest) Reset() {
@@ -520,7 +520,7 @@ type NaviListItemType struct {
 
 	Navi      *NaviType           `protobuf:"bytes,1,opt,name=navi,proto3" json:"navi,omitempty"`
 	NaviLvl2S []*NaviLvl2Item     `protobuf:"bytes,2,rep,name=navi_lvl2s,json=naviLvl2s,proto3" json:"navi_lvl2s,omitempty"` // 2级菜单是有序的
-	NextNavis []*NaviListItemType `protobuf:"bytes,3,rep,name=next_navis,json=nextNavis,proto3" json:"next_navis,omitempty"`
+	NextNavis []*NaviListItemType `protobuf:"bytes,3,rep,name=next_navis,json=nextNavis,proto3" json:"next_navis,omitempty"` // 1级分类里还可以有1级分类和内容
 }
 
 func (x *NaviListItemType) Reset() {
