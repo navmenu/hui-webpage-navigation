@@ -67,14 +67,16 @@ service Navi {
 
 message CreateNaviRequest {
   string name = 1;  // 分类名称
+  uint64 parent_id = 2; //父亲编号，这样让分类具有层级
 }
 message CreateNaviReply {
   string name = 1;  // 分类名称
 }
 
 message NaviType {
-  string name = 1;  // 分类名称
-  int32 sort = 2;   // 排序序号，按照程序下标的规则，第一个的序号是0
+  uint64 id = 1;
+  string name = 2;  // 分类名称
+  int32 sort = 3;   // 排序序号，按照程序下标的规则，第一个的序号是0
 }
 
 message DeleteNaviRequest {
@@ -105,6 +107,7 @@ message NaviLvl2Item {
 message NaviListItemType {
   NaviType navi = 1;
   repeated NaviLvl2Item navi_lvl2s = 2;  // 2级菜单是有序的
+  repeated NaviListItemType next_navis = 3;
 }
 
 message ListNaviRequest {}

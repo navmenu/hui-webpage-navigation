@@ -22,9 +22,10 @@ func (*Admin) TableName() string {
 const NaviTable = "navis"
 
 type Navi struct {
-	ID   uint64 `gorm:"primary_key" json:"id"`
-	Name string `gorm:"unique" json:"name,omitempty"`
-	Sort int32  `gorm:"index" json:"sort,omitempty"`
+	ID       uint64 `gorm:"primary_key" json:"id"`
+	Name     string `gorm:"unique; uniqueIndex:udx_same_name_same_parent" json:"name,omitempty"`
+	Sort     int32  `gorm:"index" json:"sort,omitempty"`
+	ParentID uint64 `gorm:"default:0; index; uniqueIndex:udx_same_name_same_parent" json:"parent_id,omitempty"`
 }
 
 func (*Navi) TableName() string {
