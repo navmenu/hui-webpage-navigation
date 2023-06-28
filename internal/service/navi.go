@@ -76,7 +76,11 @@ func (s *NaviService) ListNavi(ctx context.Context, req *pb.ListNaviRequest) (*p
 	if erk != nil {
 		return nil, erk
 	}
-	return &pb.ListNaviReply{Items: naviTuple2pbs(res)}, nil
+	//这里还是平铺结构的
+	slice := naviTuple2pbs(res)
+	//转换成带层级结构的
+	items := navisToLayers(slice)
+	return &pb.ListNaviReply{Items: items}, nil
 }
 
 func naviTuple2pbs(a []*tuple.T2[*models.Navi, []*models.NaviLvl2]) []*pb.NaviListItemType {
@@ -120,6 +124,24 @@ func naviLvl2item2pb(x *models.NaviLvl2) *pb.NaviLvl2Item {
 		IsEscrow: x.IsEscrow,
 		Sort:     x.Sort,
 	}
+}
+
+func navisToLayers(slice []*pb.NaviListItemType) []*pb.NaviListItemType {
+	var mp = make(map[uint64][]*pb.NaviListItemType)
+	for _, v := range slice {
+		if k := v.Navi.ParentNvid; k != 0 {
+			mp[k] = append(mp[k], v)
+		}
+	}
+	//这里最好是像这样，两个循环，第一个组成map，第二个收集结果，否的会出错
+	var resTopLayers []*pb.NaviListItemType
+	for _, v := range slice {
+		if v.Navi.ParentNvid == 0 {
+			v.NextNavis = mp[v.Navi.Id]
+			resTopLayers = append(resTopLayers, v)
+		}
+	}
+	return resTopLayers
 }
 
 func (s *NaviService) GetGuestSettings(ctx context.Context, req *pb.GetGuestSettingsRequest) (*pb.GetGuestSettingsReply, error) {

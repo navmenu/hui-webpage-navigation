@@ -37,7 +37,11 @@ func (uc *NaviUsecase) CreateNavi(ctx context.Context, req *pb.CreateNaviRequest
 		return nil, pb.ErrorAlreadyExist("navi name=%v already exist", req.Name)
 	}
 	var maxIndex int
-	if err := db.WithContext(ctx).Table(models.NaviTable).Select("COALESCE(MAX(navis.sort), -1)").Scan(&maxIndex).Error; err != nil {
+	mqs := db.WithContext(ctx).Table(models.NaviTable)
+	if req.ParentNvid != 0 {
+		mqs = mqs.Where("parent_nvid=?", req.ParentNvid)
+	}
+	if err := mqs.Select("COALESCE(MAX(navis.sort), -1)").Scan(&maxIndex).Error; err != nil {
 		return nil, pb.ErrorDbError("error=%v", err)
 	}
 	var navi = &models.Navi{
