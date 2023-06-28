@@ -41,20 +41,20 @@ func (uc *NaviUsecase) CreateNavi(ctx context.Context, req *pb.CreateNaviRequest
 		return nil, pb.ErrorDbError("error=%v", err)
 	}
 	var navi = &models.Navi{
-		ID:       0,
-		Name:     req.Name,
-		Sort:     int32(maxIndex + 1),
-		ParentID: req.ParentId,
+		ID:         0,
+		Name:       req.Name,
+		Sort:       int32(maxIndex + 1),
+		ParentNvid: req.ParentNvid,
 	}
 	var erk *errors.Error
 	if err := db.Transaction(func(tx *gorm.DB) error {
-		if navi.ParentID != 0 {
+		if navi.ParentNvid != 0 {
 			var parentNavi models.Navi
 			if err := db.WithContext(ctx).Table(models.NaviTable).
 				Clauses(clause.Locking{Strength: "UPDATE"}).
-				Where("id=?", navi.ParentID).First(&parentNavi).Error; err != nil {
+				Where("id=?", navi.ParentNvid).First(&parentNavi).Error; err != nil {
 				if err == gorm.ErrRecordNotFound {
-					erk = pb.ErrorNotExist("navi id=%v not exist", navi.ParentID)
+					erk = pb.ErrorNotExist("navi id=%v not exist", navi.ParentNvid)
 					return erk
 				} else {
 					erk = pb.ErrorDbError("error=%v", err)
@@ -95,7 +95,7 @@ func (uc *NaviUsecase) DeleteNavi(ctx context.Context, req *pb.DeleteNaviRequest
 		{
 			var cnt int64
 			if err := db.WithContext(ctx).Table(models.NaviTable).
-				Where("parent_id=?", navi.ID).Count(&cnt).Error; err != nil {
+				Where("parent_nvid=?", navi.ID).Count(&cnt).Error; err != nil {
 				erk = pb.ErrorDbError("error=%v", err)
 				return erk
 			}

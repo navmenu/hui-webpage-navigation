@@ -96,8 +96,10 @@ func naviTuple2pb(x *tuple.T2[*models.Navi, []*models.NaviLvl2]) *pb.NaviListIte
 
 func navi2pb(x *tuple.T2[*models.Navi, []*models.NaviLvl2]) *pb.NaviType {
 	return &pb.NaviType{
-		Name: x.V1.Name,
-		Sort: x.V1.Sort,
+		Id:         x.V1.ID,
+		Name:       x.V1.Name,
+		Sort:       x.V1.Sort,
+		ParentNvid: x.V1.ParentNvid,
 	}
 }
 
