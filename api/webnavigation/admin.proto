@@ -16,41 +16,41 @@ import "google/protobuf/duration.proto";
 import "errors/errors.proto";
 
 service Admin {
-  rpc CreateAdmin (CreateAdminRequest) returns (CreateAdminReply) {
+  rpc CreateAdmin(CreateAdminRequest) returns (CreateAdminReply) {
     option (google.api.http) = {
       post: "/api/web-navigation/v1/create_admin"
       body: "*"
     };
   }
-  rpc AdminLogin (AdminLoginRequest) returns (AdminLoginReply) {
+  rpc AdminLogin(AdminLoginRequest) returns (AdminLoginReply) {
     option (google.api.http) = {
       post: "/api/web-navigation/v1/admin_login"
       body: "*"
     };
   }
-  rpc UpdateAdmin (UpdateAdminRequest) returns (UpdateAdminReply) {
+  rpc UpdateAdmin(UpdateAdminRequest) returns (UpdateAdminReply) {
     option (google.api.http) = {
       post: "/api/web-navigation/v1/update_admin"
       body: "*"
     };
   }
-  rpc DeleteAdmin (DeleteAdminRequest) returns (DeleteAdminReply) {
+  rpc DeleteAdmin(DeleteAdminRequest) returns (DeleteAdminReply) {
     option (google.api.http) = {
       post: "/api/web-navigation/v1/delete_admin"
       body: "*"
     };
   }
-  rpc GetAdmin (GetAdminRequest) returns (GetAdminReply) {
+  rpc GetAdmin(GetAdminRequest) returns (GetAdminReply) {
     option (google.api.http) = {
       get: "/api/web-navigation/v1/get_admin"
     };
   }
-  rpc ListAdmin (ListAdminRequest) returns (ListAdminReply) {
+  rpc ListAdmin(ListAdminRequest) returns (ListAdminReply) {
     option (google.api.http) = {
       get: "/api/web-navigation/v1/list_admin"
     };
   }
-  rpc ListAdminOfMine (ListAdminRequest) returns (ListAdminReply) {
+  rpc ListAdminOfMine(ListAdminRequest) returns (ListAdminReply) {
     option (google.api.http) = {
       get: "/api/web-navigation/v1/list_admin_of_mine"
     };
@@ -71,11 +71,11 @@ message CreateAdminReply {
   string nickname = 2;
 }
 
-message AdminLoginRequest{
+message AdminLoginRequest {
   string username = 1;
   string password = 2;
 }
-message AdminLoginReply{
+message AdminLoginReply {
   string username = 1;
   string nickname = 2;
   string token = 3;
